@@ -8,7 +8,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.stage.Stage;
 import uet.oop.bomberman.ControlGame.controlPlayer;
-import uet.oop.bomberman.entities.Bomber;
+import uet.oop.bomberman.entities.Character.Bomber;
 import uet.oop.bomberman.graphics.Map;
 import uet.oop.bomberman.graphics.Sprite;
 

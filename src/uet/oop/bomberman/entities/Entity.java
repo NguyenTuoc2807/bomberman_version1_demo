@@ -20,6 +20,10 @@ public abstract class Entity {
         this.img = img;
     }
 
+    public Entity() {
+
+    }
+
     public double getX() {
         return x;
     }

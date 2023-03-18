@@ -5,7 +5,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.Scene;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyCode;
-import uet.oop.bomberman.entities.Bomber;
+import uet.oop.bomberman.entities.Character.Bomber;
 import uet.oop.bomberman.graphics.Sprite;
 
 public class controlPlayer {
