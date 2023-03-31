@@ -7,7 +7,9 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.stage.Stage;
+import uet.oop.bomberman.ControlGame.Move;
 import uet.oop.bomberman.ControlGame.controlPlayer;
+import uet.oop.bomberman.entities.Character.Ballom;
 import uet.oop.bomberman.entities.Character.Bomber;
 import uet.oop.bomberman.graphics.Map;
 import uet.oop.bomberman.graphics.Sprite;
@@ -31,8 +33,18 @@ public class GamePlay extends Application {
         // khởi tạo nhân vật
         Bomber bomber = new Bomber(1,1,Sprite.player_right.getFxImage());
         bomber.render(gc);
+
+        Ballom bal1 = new Ballom(14, 1, Sprite.balloom_right1.getFxImage());
+        bal1.render(gc);
+        Ballom bal2 = new Ballom(9, 6, Sprite.balloom_right1.getFxImage());
+        bal2.setSwapImg(1);
+        bal2.render(gc);
+
         // khởi tạo hàm điều khiển
         controlPlayer player =new controlPlayer(scene,bomber,gc,map.getMap());
+
+        // Khởi tạo hàm move
+        Move m = new Move(map.getMap(),  bal2, gc, 0, 0, 0 , 0);
         // khởi tạo hàm đếm thời gian
         AnimationTimer timer = new AnimationTimer() {
             private long time = 0;
@@ -46,13 +58,12 @@ public class GamePlay extends Application {
                     timeNow++;
                     time = l;
                 }
-
                 player.control();
+                m.moving();
+                System.out.println(m.up);
             }
         };
-
         timer.start();
-
     }
 
     public static void main(String[] args) {
