@@ -1,20 +1,23 @@
 package uet.oop.bomberman.graphics;
 
-import javafx.scene.canvas.GraphicsContext;
+import uet.oop.bomberman.entities.*;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.Scanner;
-import java.util.StringTokenizer;
+import java.util.*;
 
 public class Map {
-    public int level;
-    public int col;
-    public int row;
+    private int level;
+    private int col;
+    private int row;
 
-    public boolean[][] map;
+    public static char[][] map;
+    public Map() {
 
-    public void createMap(String path, GraphicsContext gc) {
+    }
+    private List<Entity> entities = new ArrayList<>();
+    private List<Entity> stillObjects = new ArrayList<>();
+    public void createMap(String path) {
         try {
             File file = new File(path);
             Scanner myReader = new Scanner(file);
@@ -24,38 +27,33 @@ public class Map {
             level = Integer.parseInt(token.nextToken());
             row = Integer.parseInt(token.nextToken());
             col = Integer.parseInt(token.nextToken());
-            map = new boolean[row][col];
-            for (int u = 0; u < row; u++) {
-                for (int v = 0; v < col; v++) {
-                    map[u][v] = true;
-                }
-            }
+
+            map = new char[row][col];
             while (myReader.hasNextLine()) {
                 for (int i = 0; i < row; i++) {
                     String data = myReader.nextLine();
                     for (int j = 0; j < col; j++) {
                         char characters = data.charAt(j);
+                        Entity obj;
                         switch (characters) {
-                            case 'x': {
-                                gc.drawImage(Sprite.portal.getFxImage(), j * Sprite.SCALED_SIZE, i * Sprite.SCALED_SIZE);
-                                break;
-                            }
                             case '#': {
-                                gc.drawImage(Sprite.wall.getFxImage(), j * Sprite.SCALED_SIZE, i * Sprite.SCALED_SIZE);
-                                map[i][j] = false;
+                                obj = new Wall(j , i , Sprite.wall.getFxImage());
+                                map[i][j] = '#';
                                 break;
                             }
 
                             case '*': {
-                                gc.drawImage(Sprite.brick.getFxImage(), j * Sprite.SCALED_SIZE, i * Sprite.SCALED_SIZE);
-                                map[i][j] = false;
+                                obj = new Brick(j , i , Sprite.brick.getFxImage());
+                                map[i][j] = '*';
                                 break;
                             }
 
                             default:
-                                gc.drawImage(Sprite.grass.getFxImage(), j * Sprite.SCALED_SIZE, i * Sprite.SCALED_SIZE);
+                                obj = new Grass(j , i , Sprite.grass.getFxImage());
+                                map[i][j] = ' ';
                                 break;
                         }
+                        stillObjects.add(obj);
                     }
                 }
             }
@@ -65,8 +63,14 @@ public class Map {
             e.printStackTrace();
         }
     }
-
-    public boolean[][] getMap() {
+    public char[][] getMap() {
         return map;
     }
+    public List<Entity> getStillObjects() {
+        return stillObjects;
+    }
+    public List<Entity> getEntities() {
+        return entities;
+    }
+
 }
