@@ -7,13 +7,13 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.stage.Stage;
+
 import uet.oop.bomberman.entities.Bomber;
 import uet.oop.bomberman.entities.Entity;
 import uet.oop.bomberman.graphics.Map;
 import uet.oop.bomberman.graphics.Sprite;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class GamePlay extends Application {
     public static final int WIDTH = 35;
@@ -26,6 +26,7 @@ public class GamePlay extends Application {
     private static char[][] mapData;
     private long startTime;
     public static long currentTime;
+
     @Override
     public void start(Stage stage) {
         canvas = new Canvas(Sprite.SCALED_SIZE * WIDTH, Sprite.SCALED_SIZE * HEIGHT);
@@ -42,7 +43,7 @@ public class GamePlay extends Application {
         stillObjects = map.getStillObjects();
         entities = map.getEntities();
         // khởi tạo nhân vật
-        Bomber bomber = new Bomber(1,1,Sprite.player_right.getFxImage(),scene);
+        Bomber bomber = new Bomber(1, 1, Sprite.player_right.getFxImage(), scene);
         entities.add(bomber);
         //Game play
         AnimationTimer timer = new AnimationTimer() {
@@ -58,9 +59,26 @@ public class GamePlay extends Application {
         startTime = System.nanoTime();
         timer.start();
     }
+
     public void update() {
-        entities.forEach(Entity::update);
+        List<Entity> stillObjectsCopy = new ArrayList<>(GamePlay.getStillObjects());
+        List<Entity> entitiesCopy = new ArrayList<>(GamePlay.getEntities());
+        for (Entity obj : stillObjectsCopy) {
+            if (obj.isExist()) {
+                obj.update();
+            } else {
+                GamePlay.getStillObjects().remove(obj);
+            }
+        }
+        for (Entity entity : entitiesCopy) {
+            if (entity.isExist()) {
+                entity.update();
+            } else {
+                GamePlay.getEntities().remove(entity);
+            }
+        }
     }
+
     public void render() {
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
         stillObjects.forEach(g -> g.render(gc));

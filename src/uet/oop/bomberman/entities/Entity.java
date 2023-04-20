@@ -5,6 +5,7 @@ import javafx.scene.image.Image;
 import uet.oop.bomberman.graphics.Sprite;
 
 public abstract class Entity {
+    private boolean exist = true;
     //Tọa độ X tính từ góc trái trên trong Canvas
     protected int x;
 
@@ -40,6 +41,13 @@ public abstract class Entity {
         this.img = img;
     }
 
+    public void setExist(boolean exist) {
+        this.exist = exist;
+    }
+
+    public boolean isExist() {
+        return exist;
+    }
 
     public void render(GraphicsContext gc) {
         gc.drawImage(img, x, y);

@@ -1,6 +1,7 @@
 package uet.oop.bomberman.graphics;
 
-import uet.oop.bomberman.entities.*;
+import uet.oop.bomberman.entities.Block.*;
+import uet.oop.bomberman.entities.Entity;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -10,7 +11,6 @@ public class Map {
     private int level;
     private int col;
     private int row;
-
     public static char[][] map;
     public Map() {
 

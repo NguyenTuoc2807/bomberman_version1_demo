@@ -6,22 +6,24 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import uet.oop.bomberman.GamePlay;
+import uet.oop.bomberman.entities.Block.Bomb;
 import uet.oop.bomberman.graphics.Sprite;
 
-import java.util.List;
 
 public class Bomber extends Entity {
+    public int posX = x;
+    public int posY = y;
     private int speed;
     private int bombLimit;
     private int bombRange;
     private int lives;
+    public Bomb bomb;
     private final BooleanProperty wPressed = new SimpleBooleanProperty();
     private final BooleanProperty aPressed = new SimpleBooleanProperty();
     private final BooleanProperty sPressed = new SimpleBooleanProperty();
     private final BooleanProperty dPressed = new SimpleBooleanProperty();
     private final BooleanProperty spacePressed = new SimpleBooleanProperty();
     private final Scene scene;
-    private List<Entity> entities = GamePlay.getEntities();
     public char[][] map = GamePlay.getMapData();
     public Bomber(int x, int y, Image img, Scene scene) {
         super(x, y, img);
@@ -34,15 +36,17 @@ public class Bomber extends Entity {
 
     public void placeBomb() {
         if (bombLimit > 0) {
-            Bomb bomb = new Bomb(x / 32, y / 32, Sprite.bomb.getFxImage());
-            entities.add(bomb);
+            int x = (int) Math.round((double) this.x / 32);
+            int y = (int) Math.round((double) this.y / 32);
+            bomb = new Bomb(x,y, Sprite.bomb.getFxImage());
+            GamePlay.getStillObjects().add(bomb);
             bombLimit--;
         }
-    }
-
-    public void setMove(int x, int y) {
-        this.x = x;
-        this.y = y;
+        if(bomb != null) {
+            if(bomb.isExplore()) {
+                bombLimit++;
+            }
+        }
     }
 
     public void changeAnimation(String direction) {
@@ -61,6 +65,10 @@ public class Bomber extends Entity {
             }
             case "RIGHT": {
                 img = Sprite.movingSprite(Sprite.player_right, Sprite.player_right_1, Sprite.player_right_2, GamePlay.currentTime, 120).getFxImage();
+                break;
+            }
+            case "DEAD": {
+                img = Sprite.movingSprite(Sprite.player_dead1, Sprite.player_dead2, Sprite.player_dead3, GamePlay.currentTime, 240).getFxImage();
                 break;
             }
         }
@@ -83,42 +91,55 @@ public class Bomber extends Entity {
                 newTileY += speed;
                 break;
         }
-        if (isValidMove(newTileX, newTileY)) {
+        if (collisionHandling(newTileX, newTileY) == 1) {
             changeAnimation(direction);
-            setMove(newTileX, newTileY);
+            posX = newTileX;
+            posY = newTileY;
+        } else if (collisionHandling(newTileX, newTileY) == 2) {
+            changeAnimation("DEAD");
+            lives--;
         }
     }
 
-    private boolean isValidMove(double tileX, double tileY) {
-        int diff = 3;
+    private int collisionHandling(double tileX, double tileY) {
+        int x = (int) Math.round(tileX / 32);
+        int y = (int) Math.round(tileY / 32);
+        int diff = 5;
         int xLeft = (int) (tileX + diff) / Sprite.SCALED_SIZE;
         int xRight = (int) (tileX + Sprite.SCALED_SIZE - diff) / Sprite.SCALED_SIZE;
         int yTop = (int) (tileY + diff) / Sprite.SCALED_SIZE;
         int yBottom = (int) (tileY + Sprite.SCALED_SIZE - diff) / Sprite.SCALED_SIZE;
 
-        return map[yTop][xLeft] == ' ' && map[yTop][xRight] == ' ' && map[yBottom][xLeft] == ' ' && map[yBottom][xRight] == ' ';
+        if(map[yTop][xLeft] == ' ' && map[yTop][xRight] == ' ' && map[yBottom][xLeft] == ' ' && map[yBottom][xRight] == ' ' && map[y][x] == ' ') {
+            return 1;
+        } else if (map[yTop][xLeft] == 'o' || map[yTop][xRight] == 'o' || map[yBottom][xLeft] == 'o' || map[yBottom][xRight] == 'o' || map[y][x] == 'o') {
+            return 2;
+        }
+        return 0;
     }
 
     public void control() {
-        setControl();
-        if (wPressed.get()) {
-            move("UP");
-        }
+        if(lives > 0) {
+            setControl();
+            if (wPressed.get()) {
+                move("UP");
+            }
 
-        if (sPressed.get()) {
-            move("DOWN");
-        }
+            if (sPressed.get()) {
+                move("DOWN");
+            }
 
-        if (aPressed.get()) {
-            move("LEFT");
-        }
+            if (aPressed.get()) {
+                move("LEFT");
+            }
 
-        if (dPressed.get()) {
-            move("RIGHT");
-        }
+            if (dPressed.get()) {
+                move("RIGHT");
+            }
 
-        if (spacePressed.get()) {
-            placeBomb();
+            if (spacePressed.get()) {
+                placeBomb();
+            }
         }
     }
 
@@ -169,5 +190,11 @@ public class Bomber extends Entity {
 
     @Override
     public void update() {
+        System.out.println(lives);
+        this.x = posX;
+        this.y = posY;
+        if(lives == 0) {
+            changeAnimation("DEAD");
+        }
     }
 }
