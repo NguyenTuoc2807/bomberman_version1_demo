@@ -1,82 +1,121 @@
 package uet.oop.bomberman.entities.Character;
 
 import javafx.scene.image.Image;
-import uet.oop.bomberman.GamePlay;
+import uet.oop.bomberman.BombermanGame;
+import uet.oop.bomberman.entities.Block.Bomb;
+import uet.oop.bomberman.entities.Explosion.Explosion;
 import uet.oop.bomberman.graphics.Sprite;
 
 import java.util.Random;
 
-public class Ballom extends Enemy {
-    public long timeMove = 20;
+
+public class Ballom extends Character {
+    public long timeMove = 5;
+    public long timeDead = 300;
+    public int randomNumber = 1;
+    public String direction = "RIGHT";
+
     public Ballom(int x, int y, Image img) {
-        super(x, y,img);
+        super(x, y, img);
+        speed = 1;
         lives = 3;
     }
-    public void changeAnimation(int direction) {
+
+    @Override
+    public void changeAnimation(String direction) {
         switch (direction) {
-            case 1 :
-            case 2: {
-                img = Sprite.movingSprite(Sprite.balloom_right1,Sprite.balloom_right2,Sprite.balloom_right3,GamePlay.currentTime,120).getFxImage();
+            case "LEFT":
+            case "UP": {
+                img = Sprite.movingSprite(Sprite.balloom_right1, Sprite.balloom_right2, Sprite.balloom_right3, BombermanGame.currentTime / 10, 120).getFxImage();
                 break;
             }
-            case 4:
-            case 3: {
-                img = Sprite.movingSprite(Sprite.balloom_left1,Sprite.balloom_left2,Sprite.balloom_left3,GamePlay.currentTime,120).getFxImage();
+            case "RIGHT":
+            case "DOWN": {
+                img = Sprite.movingSprite(Sprite.balloom_left1, Sprite.balloom_left2, Sprite.balloom_left3, BombermanGame.currentTime / 10, 120).getFxImage();
                 break;
             }
-            case 0: {
+            case "DEAD": {
                 img = Sprite.balloom_dead.getFxImage();
                 break;
             }
         }
     }
-    private boolean isValidMove(double tileX, double tileY) {
-        // Calculate the tile coordinates of the destination position
-        int destTileX = (int) tileX / Sprite.SCALED_SIZE;
-        int destTileY = (int) tileY / Sprite.SCALED_SIZE;
-        // Check if the destination tile is walkable
-        char[][] mapData = GamePlay.getMapData();
-        return mapData[destTileY][destTileX] != '#' && mapData[destTileY][destTileX] != '*';
+
+    @Override
+    public void checkMove(int tileX, int tileY) {
+        double diff = 0.5;
+        int xLeft = (int) ((tileX + diff) / Sprite.SCALED_SIZE);
+        int xRight = (int) ((tileX + Sprite.SCALED_SIZE - diff) / Sprite.SCALED_SIZE);
+        int yTop = (int) ((tileY + diff) / Sprite.SCALED_SIZE);
+        int yBottom = (int) ((tileY + Sprite.SCALED_SIZE - diff) / Sprite.SCALED_SIZE);
+        //check move
+        isMoving = map[yTop][xLeft] == ' ' && map[yTop][xRight] == ' ' && map[yBottom][xLeft] == ' ' && map[yBottom][xRight] == ' ';
     }
 
-    public void setMove(int x, int y) {
-        this.x = x;
-        this.y = y;
-    }
-    public void move(int direction) {
-        int newTileX = this.x;
-        int newTileY = this.y;
-        switch (direction) {
-            case 1:
-                newTileX -= speed;
+    @Override
+    public void collisionHandling() {
+        //check bomb and enemy collision
+        int enemyLeft = this.x;
+        int enemyRight = this.x + 32;
+        int enemyTop = this.y;
+        int enemyBottom = this.y + 32;
+        for (Explosion explosion : Bomb.getExplosions()) {
+            int bombLeft = (int) explosion.getX();
+            int bombRight = (int) (explosion.getX() + 32);
+            int bombTop = (int) explosion.getY();
+            int bombBottom = (int) (explosion.getY() + 32);
+
+            if (enemyRight > bombLeft && enemyLeft < bombRight
+                    && enemyBottom > bombTop && enemyTop < bombBottom) {
+                lives--;
                 break;
-            case 2:
-                newTileX += speed;
-                break;
-            case 3:
-                newTileY -= speed;
-                break;
-            case 4:
-                newTileY += speed;
-                break;
-        }
-        if (isValidMove(newTileX, newTileY)) {
-            changeAnimation(direction);
-            setMove(newTileX, newTileY);
+            }
         }
     }
+
+    public boolean canBeRedirected(int x, int y) {
+        return x % 32 == 0 && y % 32 == 0;
+    }
+
+    public void animateDead() {
+        img = Sprite.movingSprite(Sprite.mob_dead1, Sprite.mob_dead2, Sprite.mob_dead3, BombermanGame.currentTime / 100, 60).getFxImage();
+    }
+
     @Override
     public void update() {
-        if(lives > 0 && GamePlay.currentTime % timeMove == 0) {
-            Random random = new Random();
-            int randomNumber = random.nextInt(4) + 1;
-            move(randomNumber);
-        }else {
-            move(0);
-            GamePlay.getEntities().remove(this);
+        if (canBeRedirected(x, y)) {
+            Random r = new Random();
+            randomNumber = r.nextInt(4) + 1;
+            if (randomNumber == 1) {
+                direction = "LEFT";
+            } else if (randomNumber == 2) {
+                direction = "RIGHT";
+            } else if (randomNumber == 3) {
+                direction = "UP";
+            } else {
+                direction = "DOWN";
+            }
         }
+        if (lives > 0) {
+            if (timeMove > 0) {
+                timeMove--;
+            } else {
+                move(direction);
+                changeAnimation(direction);
+                timeMove = 5;
+            }
+        } else {
+            if (timeDead > 0) {
+                if (timeDead >= 200) {
+                    changeAnimation("DEAD");
+                }
+                timeDead--;
+                animateDead();
+            } else {
+                setExist(false);
+            }
+        }
+        super.update();
     }
-
-
 
 }
