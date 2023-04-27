@@ -12,7 +12,6 @@ public class FlameItem extends Entity {
     @Override
     public void update() {
         if(!isExist()){
-            BombermanGame.getItems().remove(this);
             BombermanGame.getStillObjects().remove(this);
         }
     }

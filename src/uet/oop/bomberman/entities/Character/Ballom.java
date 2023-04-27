@@ -3,6 +3,7 @@ package uet.oop.bomberman.entities.Character;
 import javafx.scene.image.Image;
 import uet.oop.bomberman.BombermanGame;
 import uet.oop.bomberman.entities.Block.Bomb;
+import uet.oop.bomberman.entities.Entity;
 import uet.oop.bomberman.entities.Explosion.Explosion;
 import uet.oop.bomberman.graphics.Sprite;
 
@@ -54,21 +55,21 @@ public class Ballom extends Character {
 
     @Override
     public void collisionHandling() {
-        //check bomb and enemy collision
         int enemyLeft = this.x;
         int enemyRight = this.x + 32;
         int enemyTop = this.y;
         int enemyBottom = this.y + 32;
-        for (Explosion explosion : Bomb.getExplosions()) {
-            int bombLeft = (int) explosion.getX();
-            int bombRight = (int) (explosion.getX() + 32);
-            int bombTop = (int) explosion.getY();
-            int bombBottom = (int) (explosion.getY() + 32);
-
-            if (enemyRight > bombLeft && enemyLeft < bombRight
-                    && enemyBottom > bombTop && enemyTop < bombBottom) {
-                lives--;
-                break;
+        // check collision
+        for(Entity obj : BombermanGame.getStillObjects()) {
+            int objLeft = (int) obj.getX();
+            int objRight = (int) (obj.getX() + 32);
+            int objTop = (int) obj.getY();
+            int objBottom = (int) (obj.getY() + 32);
+            if(objLeft < enemyRight && objRight > enemyLeft && objTop < enemyBottom && objBottom > enemyTop) {
+                if(obj instanceof Explosion){
+                    lives--;
+                    break;
+                }
             }
         }
     }
@@ -80,7 +81,6 @@ public class Ballom extends Character {
     public void animateDead() {
         img = Sprite.movingSprite(Sprite.mob_dead1, Sprite.mob_dead2, Sprite.mob_dead3, BombermanGame.currentTime / 100, 60).getFxImage();
     }
-
     @Override
     public void update() {
         if (canBeRedirected(x, y)) {

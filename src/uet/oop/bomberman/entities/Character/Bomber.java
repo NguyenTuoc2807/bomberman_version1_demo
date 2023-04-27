@@ -6,7 +6,9 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import uet.oop.bomberman.BombermanGame;
+import uet.oop.bomberman.ControlGame.LevelManager;
 import uet.oop.bomberman.entities.Block.Bomb;
+import uet.oop.bomberman.entities.Block.Portal;
 import uet.oop.bomberman.entities.Entity;
 import uet.oop.bomberman.entities.Explosion.Explosion;
 import uet.oop.bomberman.entities.Item.*;
@@ -19,6 +21,8 @@ import java.util.List;
 public class Bomber extends Character {
     private int bombLimit;
     private int bombRange;
+    private int timeImmortal = 0;
+    private boolean isDead = false;
     public static List<Bomb> bombs = new ArrayList<>();
     private final BooleanProperty wPressed = new SimpleBooleanProperty();
     private final BooleanProperty aPressed = new SimpleBooleanProperty();
@@ -55,6 +59,8 @@ public class Bomber extends Character {
         //check move
         isMoving = map[yTop][xLeft] == ' ' && map[yTop][xRight] == ' ' && map[yBottom][xLeft] == ' ' && map[yBottom][xRight] == ' ';
     }
+    public void animateDead() {
+        img = Sprite.movingSprite(Sprite.player_dead1, Sprite.player_dead2, Sprite.player_dead3, BombermanGame.currentTime/10, 120).getFxImage();    }
     @Override
     public void changeAnimation(String direction) {
         switch (direction) {
@@ -74,72 +80,72 @@ public class Bomber extends Character {
                 img = Sprite.movingSprite(Sprite.player_right, Sprite.player_right_1, Sprite.player_right_2, BombermanGame.currentTime, 120).getFxImage();
                 break;
             }
-            case "DEAD": {
-                img = Sprite.movingSprite(Sprite.player_dead1, Sprite.player_dead2, Sprite.player_dead3, BombermanGame.currentTime/10, 240).getFxImage();
-                break;
-            }
         }
     }
     @Override
     public void collisionHandling() {
-        //check bomb and enemy collision
         int bomberLeft = this.x;
         int bomberRight = this.x + 32;
         int bomberTop = this.y;
         int bomberBottom = this.y + 32;
-        for (Character enemy : BombermanGame.getEntities()) {
-            if (enemy instanceof Ballom) {
-                int enemyLeft = (int) enemy.getX();
-                int enemyRight = (int) (enemy.getX() + 32);
-                int enemyTop = (int) enemy.getY();
-                int enemyBottom = (int) (enemy.getY() + 32);
+        //check collision
+        if(timeImmortal == 0){
+            for (Character enemy : BombermanGame.getEntities()) {
+                if (enemy instanceof Ballom) {
+                    int enemyLeft = (int) enemy.getX();
+                    int enemyRight = (int) (enemy.getX() + 32);
+                    int enemyTop = (int) enemy.getY();
+                    int enemyBottom = (int) (enemy.getY() + 32);
 
-                if (bomberRight > enemyLeft && bomberLeft < enemyRight
-                        && bomberBottom > enemyTop && bomberTop < enemyBottom) {
+                    if (bomberRight > enemyLeft && bomberLeft < enemyRight && bomberBottom > enemyTop && bomberTop < enemyBottom) {
+                        lives--;
+                        isDead = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        for(Entity obj : BombermanGame.getStillObjects()) {
+            int objLeft = (int) obj.getX();
+            int objRight = (int) (obj.getX() + 32);
+            int objTop = (int) obj.getY();
+            int objBottom = (int) (obj.getY() + 32);
+
+            if(bomberRight > objLeft && bomberLeft < objRight && bomberBottom > objTop && bomberTop < objBottom ){
+                if (obj instanceof Portal) {
+                    LevelManager.setIsEnd(true);
+                    break;
+                }
+                if(obj instanceof Explosion && timeImmortal == 0) {
                     lives--;
+                    isDead = true;
                     break;
                 }
-            }
-        }
-        for (Explosion explosion : Bomb.getExplosions()) {
-            int bombLeft = (int) explosion.getX();
-            int bombRight = (int) (explosion.getX() + 32);
-            int bombTop = (int) explosion.getY();
-            int bombBottom = (int) (explosion.getY() + 32);
-
-            if (bomberRight > bombLeft && bomberLeft < bombRight
-                    && bomberBottom > bombTop && bomberTop < bombBottom) {
-                lives--;
-                break;
-            }
-        }
-        //check item
-        for(Entity item : BombermanGame.getItems()) {
-            int itemLeft = (int) item.getX();
-            int itemRight = (int) (item.getX() + 32);
-            int itemTop = (int) item.getY();
-            int itemBottom = (int) (item.getY() + 32);
-
-            if (bomberRight > itemLeft && bomberLeft < itemRight
-                    && bomberBottom > itemTop && bomberTop < itemBottom) {
-                if(item instanceof SpeedItem) {
+                if(obj instanceof SpeedItem) {
+                    obj.setExist(false);
                     speed++;
-                    item.setExist(false);
                     break;
                 }
-                if(item instanceof BombItem) {
+                if(obj instanceof BombItem) {
+                    obj.setExist(false);
                     bombLimit++;
-                    item.setExist(false);
                     break;
                 }
-                if(item instanceof FlameItem) {
+                if(obj instanceof FlameItem) {
+                    obj.setExist(false);
                     bombRange++;
-                    item.setExist(false);
                     break;
                 }
             }
-        }
 
+
+        }
+        // check if bomber is dead
+        if(isDead && lives > 0) {
+            isDead = false;
+            timeImmortal = 200;
+        }
     }
 
     public void control() {
@@ -213,18 +219,21 @@ public class Bomber extends Character {
         });
     }
 
-    public static List<Bomb> getBombs() {
-        return bombs;
+    public int getLives() {
+        return lives;
     }
-
     @Override
     public void update() {
-        if (lives > 0) {
+        if (lives > 0 && timeImmortal == 0) {
             control();
+            super.update();
+        } else if(lives >0 && timeImmortal > 0) {
+            timeImmortal--;
+            animateDead();
         } else {
-            changeAnimation("DEAD");
+            animateDead();
         }
-        super.update();
+
         // update bombs
         List<Bomb> bombsCopy = new ArrayList<>(bombs);
         for (Bomb bomb : bombsCopy) {

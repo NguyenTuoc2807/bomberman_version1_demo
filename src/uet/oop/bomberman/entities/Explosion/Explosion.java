@@ -21,7 +21,6 @@ public class Explosion extends Entity {
         if(timeToExplode > 0) {
             timeToExplode--;
         }else {
-            Bomb.getExplosions().remove(this);
             setExist(false);
         }
     }
