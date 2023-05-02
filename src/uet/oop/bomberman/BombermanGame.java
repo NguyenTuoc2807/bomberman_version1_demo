@@ -1,15 +1,25 @@
 package uet.oop.bomberman;
 
 import javafx.animation.AnimationTimer;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.VPos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.media.MediaPlayer;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import uet.oop.bomberman.ControlGame.LevelManager;
 import uet.oop.bomberman.entities.Block.Brick;
 import uet.oop.bomberman.entities.Block.Grass;
@@ -31,6 +41,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.StringTokenizer;
+
+import static uet.oop.bomberman.Sound.media;
 
 public class BombermanGame extends Application {
     public static final int WIDTH = 31;
@@ -58,6 +70,9 @@ public class BombermanGame extends Application {
         createMenu();
         stage.setScene(menuScene);
         stage.show();
+        // TODO:
+        Sound.loadMedia();
+        Sound.playBackground(Sound.heading);
     }
 
     private void createMenu() throws IOException {
@@ -69,14 +84,28 @@ public class BombermanGame extends Application {
         playButton.setOnAction(event -> {
             createGame();
             stage.setScene(gameScene);
+            Sound.stopBackground();
         });
 
         Button exitButton = (Button) menuBox.lookup("#Exit");
         exitButton.setOnAction(event -> stage.close());
 
-
         menuScene = new Scene(menuBox);
+
     }
+
+    private void showStartScreen() {
+        gc.setFill(Color.BLACK);
+        gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+        gc.setFont(new Font("Arial", 48));
+        gc.setFill(Color.WHITE);
+        gc.setStroke(Color.WHITE);
+        gc.setTextAlign(TextAlignment.CENTER);
+        gc.setTextBaseline(VPos.CENTER);
+        gc.strokeText("Level 1", canvas.getWidth() / 2, canvas.getHeight() / 2);
+        gc.fillText("Level 1", canvas.getWidth() / 2, canvas.getHeight() / 2);
+    }
+
 
     private void createGame() {
         canvas = new Canvas(Sprite.SCALED_SIZE * WIDTH, Sprite.SCALED_SIZE * HEIGHT);
@@ -85,6 +114,8 @@ public class BombermanGame extends Application {
         // game initialization
         LevelManager levelManager = new LevelManager();
         createMap(levelManager.getLevel());
+
+        Sound.playSfx(Sound.ingame);
         //Game play
         AnimationTimer timer = new AnimationTimer() {
             @Override
@@ -102,7 +133,6 @@ public class BombermanGame extends Application {
         };
         startTime = System.nanoTime();
         timer.start();
-
     }
 
     public void update() {

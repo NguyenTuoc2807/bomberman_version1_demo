@@ -3,6 +3,7 @@ package uet.oop.bomberman.entities.Block;
 import javafx.scene.image.Image;
 import uet.oop.bomberman.BombermanGame;
 import uet.oop.bomberman.ControlGame.CollisionManager;
+import uet.oop.bomberman.Sound;
 import uet.oop.bomberman.entities.Entity;
 import uet.oop.bomberman.entities.Explosion.*;
 import uet.oop.bomberman.graphics.Sprite;
@@ -25,6 +26,7 @@ public class Bomb extends Entity {
         int y = (int) Math.round((double) this.y / 32);
         Explosion explosion = new Explosion(x, y, Sprite.bomb_exploded.getFxImage());
         BombermanGame.getStillObjects().add(explosion);
+        Sound.playSfx(Sound.explosion);
         for (int i = 1; i <= flameRange; i++) {
             if (i == flameRange) {
                 if (explosionUp) {

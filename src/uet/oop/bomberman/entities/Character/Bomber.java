@@ -7,6 +7,7 @@ import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import uet.oop.bomberman.BombermanGame;
 import uet.oop.bomberman.ControlGame.LevelManager;
+import uet.oop.bomberman.Sound;
 import uet.oop.bomberman.entities.Block.Bomb;
 import uet.oop.bomberman.entities.Block.Portal;
 import uet.oop.bomberman.entities.Entity;
@@ -48,6 +49,9 @@ public class Bomber extends Character {
             bombs.add(bomb);
             BombermanGame.getStillObjects().add(bomb);
             bombLimit--;
+
+            Sound.loadMedia();
+            Sound.playSfx(Sound.placebomb);
         }
     }
     public void checkMove(int tileX, int tileY) {
@@ -60,7 +64,11 @@ public class Bomber extends Character {
         isMoving = map[yTop][xLeft] == ' ' && map[yTop][xRight] == ' ' && map[yBottom][xLeft] == ' ' && map[yBottom][xRight] == ' ';
     }
     public void animateDead() {
-        img = Sprite.movingSprite(Sprite.player_dead1, Sprite.player_dead2, Sprite.player_dead3, BombermanGame.currentTime/10, 120).getFxImage();    }
+        img = Sprite.movingSprite(Sprite.player_dead1, Sprite.player_dead2, Sprite.player_dead3, BombermanGame.currentTime/10, 120).getFxImage();
+
+//        Sound.loadMedia();
+//        Sound.playSfx(Sound.die);
+    }
     @Override
     public void changeAnimation(String direction) {
         switch (direction) {
@@ -105,7 +113,6 @@ public class Bomber extends Character {
                 }
             }
         }
-
         for(Entity obj : BombermanGame.getStillObjects()) {
             int objLeft = (int) obj.getX();
             int objRight = (int) (obj.getX() + 32);
@@ -125,16 +132,20 @@ public class Bomber extends Character {
                 if(obj instanceof SpeedItem) {
                     obj.setExist(false);
                     speed++;
+                    Sound.loadMedia();
+                    Sound.playSfx(Sound.takePower);
                     break;
                 }
                 if(obj instanceof BombItem) {
                     obj.setExist(false);
                     bombLimit++;
+                    Sound.playSfx(Sound.takePower);
                     break;
                 }
                 if(obj instanceof FlameItem) {
                     obj.setExist(false);
                     bombRange++;
+                    Sound.playSfx(Sound.takePower);
                     break;
                 }
             }
@@ -230,6 +241,7 @@ public class Bomber extends Character {
         } else if(lives >0 && timeImmortal > 0) {
             timeImmortal--;
             animateDead();
+
         } else {
             animateDead();
         }
