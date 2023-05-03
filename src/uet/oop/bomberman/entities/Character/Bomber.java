@@ -52,7 +52,7 @@ public class Bomber extends Character {
             bombs.add(bomb);
             BombermanGame.getStillObjects().add(bomb);
             bombLimit--;
-            Sound.playSfx(Sound.placebomb);
+            Sound.playSfx(Sound.placeBomb);
         }
     }
 
@@ -258,6 +258,7 @@ public class Bomber extends Character {
         if (timeImmortal > 0) {
             timeImmortal--;
             animateDead();
+            Sound.playSfx(Sound.die);
             if (timeImmortal < 10) {
                 changeAnimation("RIGHT");
             }

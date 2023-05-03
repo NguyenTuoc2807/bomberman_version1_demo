@@ -7,16 +7,17 @@ import javafx.scene.media.MediaPlayer;
 import java.io.File;
 
 public class Sound {
-    public static Media media;
-    public static Media ingame;
+    public static Media inGame = new Media(new File("res/sound/ingame.mp3").toURI().toString());
     public static AudioClip level;
-    public static AudioClip placebomb;
-    public static AudioClip explosion;
-    public static Media heading;
-    public static AudioClip die;
-    public static AudioClip takePower;
+    public static AudioClip placeBomb = new AudioClip(new File("res/sound/placebomb.wav").toURI().toString());
 
-    private static MediaPlayer backgroundPlayer;
+    public static AudioClip explosion = new AudioClip(new File("res/sound/explosion.wav").toURI().toString());
+    public static Media heading = new Media(new File("res/sound/heading.mp3").toURI().toString());
+    public static AudioClip die = new AudioClip(new File("res/sound/die.wav").toURI().toString());
+    public static AudioClip takePower = new AudioClip(new File("res/sound/takepower.wav").toURI().toString());
+
+    private static MediaPlayer headingPlayer = new MediaPlayer(heading);
+    private static MediaPlayer inGamePlayer = new MediaPlayer(inGame);
 
     public static void playSfx(AudioClip audioClip) {
         audioClip.play();
@@ -27,29 +28,20 @@ public class Sound {
         mediaPlayer.play();
     }
 
-    public static void playBackground(Media media) {
-        if (backgroundPlayer != null) {
-            backgroundPlayer.stop();
-        }
-        backgroundPlayer = new MediaPlayer(media);
-        backgroundPlayer.play();
+    public static void playInGame() {
+        inGamePlayer.play();
     }
 
-    public static void stopBackground() {
-        if (backgroundPlayer != null) {
-            backgroundPlayer.stop();
-            backgroundPlayer = null;
-        }
+    public static void playHeading() {
+        headingPlayer.play();
     }
 
+    public static void stopHeading() {
+        headingPlayer.stop();
+    }
 
-    public static void loadMedia() {
-        placebomb = new AudioClip(new File("res/sound/placebomb.wav").toURI().toString());
-        explosion = new AudioClip(new File("res/sound/explosion.wav").toURI().toString());
-        heading = new Media(new File("res/sound/heading.mp3").toURI().toString());
-        die = new AudioClip(new File("res/sound/die.wav").toURI().toString());
-        ingame = new Media(new File("res/sound/ingame.mp3").toURI().toString());
-        takePower = new AudioClip(new File("res/sound/takepower.wav").toURI().toString());
+    public static void stopInGame() {
+        inGamePlayer.stop();
     }
 
 }

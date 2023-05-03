@@ -66,14 +66,13 @@ public class BombermanGame extends Application {
         createMenu();
         stage.setScene(menuScene);
         stage.show();
-        Sound.loadMedia();
-        Sound.playBackground(Sound.heading);
     }
 
     private void createMenu() throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(new File("res/Game/Menu.fxml").toURI().toURL());
         AnchorPane menuBox = fxmlLoader.load();
 
+        Sound.playHeading();
 
         Button playButton = (Button) menuBox.lookup("#playButton");
         playButton.setOnAction(event -> {
@@ -82,7 +81,7 @@ public class BombermanGame extends Application {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            Sound.stopBackground();
+            Sound.stopHeading();
             stage.setScene(gameScene);
         });
 
@@ -102,7 +101,7 @@ public class BombermanGame extends Application {
         canvas.setHeight(HEIGHT * Sprite.SCALED_SIZE);
         gc = canvas.getGraphicsContext2D();
         gameScene = new Scene(gameBox);
-        Sound.playSfx(Sound.ingame);
+        Sound.playInGame();
         // game initialization
         stillObjects.clear();
         entities.clear();
@@ -138,6 +137,7 @@ public class BombermanGame extends Application {
             public void handle(long l) {
                 // is game over
                 if (bomber.getLives() == 0 || time == 0) {
+                    timeline.stop();
                     try {
                         GameOver();
                     } catch (IOException e) {
@@ -164,6 +164,9 @@ public class BombermanGame extends Application {
     }
 
     private void GameOver() throws IOException {
+        stillObjects.clear();
+        entities.clear();
+        Sound.stopInGame();
         FXMLLoader fxmlLoader = new FXMLLoader(new File("res/Game/GameOver.fxml").toURI().toURL());
         AnchorPane gameOverBox = fxmlLoader.load();
         Button playButton = (Button) gameOverBox.lookup("#playAgain");
@@ -237,7 +240,7 @@ public class BombermanGame extends Application {
                         char characters = data.charAt(j);
                         switch (characters) {
                             case 'p': {
-                                if (bomber == null) {
+                                if (bomber == null || bomber.getLives() == 0) {
                                     Bomber obj = new Bomber(j, i, Sprite.player_right.getFxImage());
                                     bomber = obj;
                                     entities.add(obj);
