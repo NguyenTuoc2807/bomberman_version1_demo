@@ -15,5 +15,4 @@ public class SpeedItem extends Entity {
             BombermanGame.getStillObjects().remove(this);
         }
     }
-
 }
