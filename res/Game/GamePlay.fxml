@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.effect.Glow?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="550.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Canvas fx:id="gameplay" height="500.0" layoutY="45.0" width="1000.0" />
+      <Label fx:id="timer" alignment="CENTER" prefHeight="45.0" prefWidth="140.0" text="Start" textAlignment="CENTER" textOverrun="CLIP">
+         <effect>
+            <Glow />
+         </effect>
+      </Label>
+      <Label fx:id="lives" alignment="CENTER" layoutX="140.0" prefHeight="45.0" prefWidth="140.0" text="Live" />
+      <Label fx:id="score" alignment="CENTER" layoutX="280.0" prefHeight="45.0" prefWidth="140.0" text="Score" />
+      <Label fx:id="level" alignment="CENTER" layoutX="420.0" prefHeight="45.0" prefWidth="140.0" text="Level" />
+   </children>
+</AnchorPane>

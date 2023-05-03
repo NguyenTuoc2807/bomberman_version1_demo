@@ -11,7 +11,7 @@ public class ExplosionUp extends Explosion {
 
     @Override
     public void animate() {
-        img = Sprite.movingSprite(Sprite.explosion_vertical_top_last,Sprite.explosion_vertical_top_last1, Sprite.explosion_vertical_top_last2, BombermanGame.currentTime, 120).getFxImage();
+        img = Sprite.movingSprite(Sprite.explosion_vertical_top_last, Sprite.explosion_vertical_top_last1, Sprite.explosion_vertical_top_last2, BombermanGame.currentTime, 120).getFxImage();
     }
 
     @Override

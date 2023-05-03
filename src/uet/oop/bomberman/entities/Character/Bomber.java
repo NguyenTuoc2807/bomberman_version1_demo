@@ -6,12 +6,14 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import uet.oop.bomberman.BombermanGame;
-import uet.oop.bomberman.ControlGame.LevelManager;
+import uet.oop.bomberman.Sound.Sound;
 import uet.oop.bomberman.entities.Block.Bomb;
 import uet.oop.bomberman.entities.Block.Portal;
 import uet.oop.bomberman.entities.Entity;
 import uet.oop.bomberman.entities.Explosion.Explosion;
-import uet.oop.bomberman.entities.Item.*;
+import uet.oop.bomberman.entities.Item.BombItem;
+import uet.oop.bomberman.entities.Item.FlameItem;
+import uet.oop.bomberman.entities.Item.SpeedItem;
 import uet.oop.bomberman.graphics.Sprite;
 
 import java.util.ArrayList;
@@ -23,6 +25,8 @@ public class Bomber extends Character {
     private int bombRange;
     private int timeImmortal = 0;
     private boolean isDead = false;
+    private int score = 0;
+    private boolean isNextLevel = false;
     public static List<Bomb> bombs = new ArrayList<>();
     private final BooleanProperty wPressed = new SimpleBooleanProperty();
     private final BooleanProperty aPressed = new SimpleBooleanProperty();
@@ -37,7 +41,7 @@ public class Bomber extends Character {
         this.speed = 1;
         this.bombLimit = 1;
         this.bombRange = 1;
-        this.lives = 3;
+        this.lives = 10;
     }
 
     public void placeBomb() {
@@ -48,8 +52,10 @@ public class Bomber extends Character {
             bombs.add(bomb);
             BombermanGame.getStillObjects().add(bomb);
             bombLimit--;
+            Sound.playSfx(Sound.placebomb);
         }
     }
+
     public void checkMove(int tileX, int tileY) {
         int diff = 4;
         int xLeft = (tileX + diff) / Sprite.SCALED_SIZE;
@@ -59,8 +65,11 @@ public class Bomber extends Character {
         //check move
         isMoving = map[yTop][xLeft] == ' ' && map[yTop][xRight] == ' ' && map[yBottom][xLeft] == ' ' && map[yBottom][xRight] == ' ';
     }
+
     public void animateDead() {
-        img = Sprite.movingSprite(Sprite.player_dead1, Sprite.player_dead2, Sprite.player_dead3, BombermanGame.currentTime/10, 120).getFxImage();    }
+        img = Sprite.movingSprite(Sprite.player_dead1, Sprite.player_dead2, Sprite.player_dead3, BombermanGame.currentTime / 10, 120).getFxImage();
+    }
+
     @Override
     public void changeAnimation(String direction) {
         switch (direction) {
@@ -82,6 +91,7 @@ public class Bomber extends Character {
             }
         }
     }
+
     @Override
     public void collisionHandling() {
         int bomberLeft = this.x;
@@ -89,51 +99,55 @@ public class Bomber extends Character {
         int bomberTop = this.y;
         int bomberBottom = this.y + 32;
         //check collision
-        if(timeImmortal == 0){
-            for (Character enemy : BombermanGame.getEntities()) {
-                if (enemy instanceof Ballom) {
-                    int enemyLeft = (int) enemy.getX();
-                    int enemyRight = (int) (enemy.getX() + 32);
-                    int enemyTop = (int) enemy.getY();
-                    int enemyBottom = (int) (enemy.getY() + 32);
-
-                    if (bomberRight > enemyLeft && bomberLeft < enemyRight && bomberBottom > enemyTop && bomberTop < enemyBottom) {
-                        lives--;
-                        isDead = true;
-                        break;
-                    }
+        for (Character enemy : BombermanGame.getEntities()) {
+            if (enemy instanceof Ballom) {
+                if (((Ballom) enemy).isDead()) {
+                    continue;
                 }
-            }
-        }
+                int enemyLeft = (int) enemy.getX();
+                int enemyRight = (int) (enemy.getX() + 32);
+                int enemyTop = (int) enemy.getY();
+                int enemyBottom = (int) (enemy.getY() + 32);
 
-        for(Entity obj : BombermanGame.getStillObjects()) {
-            int objLeft = (int) obj.getX();
-            int objRight = (int) (obj.getX() + 32);
-            int objTop = (int) obj.getY();
-            int objBottom = (int) (obj.getY() + 32);
-
-            if(bomberRight > objLeft && bomberLeft < objRight && bomberBottom > objTop && bomberTop < objBottom ){
-                if (obj instanceof Portal) {
-                    LevelManager.setIsEnd(true);
-                    break;
-                }
-                if(obj instanceof Explosion && timeImmortal == 0) {
+                if (bomberRight > enemyLeft && bomberLeft < enemyRight && bomberBottom > enemyTop && bomberTop < enemyBottom) {
                     lives--;
                     isDead = true;
                     break;
                 }
-                if(obj instanceof SpeedItem) {
+            }
+        }
+
+        for (Entity obj : BombermanGame.getStillObjects()) {
+            int objLeft = (int) obj.getX() + 15;
+            int objRight = (int) (obj.getX() + 25);
+            int objTop = (int) obj.getY() + 15;
+            int objBottom = (int) (obj.getY() + 25);
+
+            if (bomberRight > objLeft && bomberLeft < objRight && bomberBottom > objTop && bomberTop < objBottom) {
+                if (obj instanceof Portal) {
+                    isNextLevel = true;
+                    break;
+                }
+                if (obj instanceof Explosion && timeImmortal == 0) {
+                    lives--;
+                    isDead = true;
+                    break;
+                }
+                if (obj instanceof SpeedItem) {
                     obj.setExist(false);
+                    Sound.playSfx(Sound.takePower);
                     speed++;
                     break;
                 }
-                if(obj instanceof BombItem) {
+                if (obj instanceof BombItem) {
                     obj.setExist(false);
+                    Sound.playSfx(Sound.takePower);
                     bombLimit++;
                     break;
                 }
-                if(obj instanceof FlameItem) {
+                if (obj instanceof FlameItem) {
                     obj.setExist(false);
+                    Sound.playSfx(Sound.takePower);
                     bombRange++;
                     break;
                 }
@@ -142,8 +156,7 @@ public class Bomber extends Character {
 
         }
         // check if bomber is dead
-        if(isDead && lives > 0) {
-            isDead = false;
+        if (isDead) {
             timeImmortal = 200;
         }
     }
@@ -222,18 +235,35 @@ public class Bomber extends Character {
     public int getLives() {
         return lives;
     }
+
+    public int getScore() {
+        return score;
+    }
+
+    public boolean isNextLevel() {
+        return isNextLevel;
+    }
+
+    public void setNextLevel(boolean nextLevel) {
+        isNextLevel = nextLevel;
+    }
+
     @Override
     public void update() {
-        if (lives > 0 && timeImmortal == 0) {
+        if (lives > 0 && !isDead) {
             control();
             super.update();
-        } else if(lives >0 && timeImmortal > 0) {
+            collisionHandling();
+        }
+        if (timeImmortal > 0) {
             timeImmortal--;
             animateDead();
+            if (timeImmortal < 10) {
+                changeAnimation("RIGHT");
+            }
         } else {
-            animateDead();
+            isDead = false;
         }
-
         // update bombs
         List<Bomb> bombsCopy = new ArrayList<>(bombs);
         for (Bomb bomb : bombsCopy) {

@@ -33,5 +33,9 @@ public class CollisionManager {
             }
         }
     }
+
+    public void setMap(int x, int y, char val) {
+        map[y][x] = val;
+    }
 }
 

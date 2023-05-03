@@ -1,16 +1,20 @@
 package uet.oop.bomberman;
 
 import javafx.animation.AnimationTimer;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import uet.oop.bomberman.ControlGame.LevelManager;
+import uet.oop.bomberman.Sound.Sound;
 import uet.oop.bomberman.entities.Block.Brick;
 import uet.oop.bomberman.entities.Block.Grass;
 import uet.oop.bomberman.entities.Block.Portal;
@@ -38,6 +42,7 @@ public class BombermanGame extends Application {
 
     private Stage stage;
     private Scene menuScene;
+    private Scene gameOverScene;
     private static Scene gameScene;
     private GraphicsContext gc;
     private Canvas canvas;
@@ -47,6 +52,9 @@ public class BombermanGame extends Application {
     private long startTime;
 
     public static long currentTime;
+    private int time;
+    private Bomber bomber;
+    private int level;
 
     public static void main(String[] args) {
         Application.launch(BombermanGame.class);
@@ -58,16 +66,23 @@ public class BombermanGame extends Application {
         createMenu();
         stage.setScene(menuScene);
         stage.show();
+        Sound.loadMedia();
+        Sound.playBackground(Sound.heading);
     }
 
     private void createMenu() throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(new File("res/Menu/BombermanGame.fxml").toURI().toURL());
+        FXMLLoader fxmlLoader = new FXMLLoader(new File("res/Game/Menu.fxml").toURI().toURL());
         AnchorPane menuBox = fxmlLoader.load();
 
 
         Button playButton = (Button) menuBox.lookup("#playButton");
         playButton.setOnAction(event -> {
-            createGame();
+            try {
+                createGame();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            Sound.stopBackground();
             stage.setScene(gameScene);
         });
 
@@ -78,19 +93,63 @@ public class BombermanGame extends Application {
         menuScene = new Scene(menuBox);
     }
 
-    private void createGame() {
-        canvas = new Canvas(Sprite.SCALED_SIZE * WIDTH, Sprite.SCALED_SIZE * HEIGHT);
+    private void createGame() throws IOException {
+        // setup game
+        FXMLLoader fxmlLoader = new FXMLLoader(new File("res/Game/GamePlay.fxml").toURI().toURL());
+        AnchorPane gameBox = fxmlLoader.load();
+        canvas = (Canvas) gameBox.lookup("#gameplay");
+        canvas.setWidth(WIDTH * Sprite.SCALED_SIZE);
+        canvas.setHeight(HEIGHT * Sprite.SCALED_SIZE);
         gc = canvas.getGraphicsContext2D();
-        gameScene = new Scene(new Group(canvas));
+        gameScene = new Scene(gameBox);
+        Sound.playSfx(Sound.ingame);
         // game initialization
+        stillObjects.clear();
+        entities.clear();
         LevelManager levelManager = new LevelManager();
         createMap(levelManager.getLevel());
+        // timer
+        Timeline timeline = new Timeline();
+        time = 60;
+        timeline.setCycleCount(Timeline.INDEFINITE);
+        Label timerLabel = (Label) gameBox.lookup("#timer");
+        Label livesLabel = (Label) gameBox.lookup("#lives");
+        Label scoreLabel = (Label) gameBox.lookup("#score");
+        Label levelLabel = (Label) gameBox.lookup("#level");
+
+        KeyFrame keyFrame = new KeyFrame(Duration.seconds(1), event -> {
+            time--;
+            if (time >= 0) {
+                timerLabel.setText(String.format("%02d:%02d", time / 60, time % 60));
+                livesLabel.setText(String.format("Lives: %d", bomber.getLives()));
+                scoreLabel.setText(String.format("Score: %d", bomber.getScore()));
+                levelLabel.setText(String.format("Level: %d", level));
+            } else {
+                timeline.stop();
+            }
+        });
+
+        timeline.getKeyFrames().add(keyFrame);
+        timeline.play();
+
         //Game play
         AnimationTimer timer = new AnimationTimer() {
             @Override
             public void handle(long l) {
-                if(LevelManager.isIsEnd()) {
-                    LevelManager.setIsEnd(false);
+                // is game over
+                if (bomber.getLives() == 0 || time == 0) {
+                    try {
+                        GameOver();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    stage.setScene(gameOverScene);
+                    stop();
+                }
+                // next level
+                if (bomber.isNextLevel()) {
+                    time = 60;
+                    bomber.setNextLevel(false);
                     levelManager.nextLevel();
                     createMap(levelManager.getLevel());
                 }
@@ -102,7 +161,32 @@ public class BombermanGame extends Application {
         };
         startTime = System.nanoTime();
         timer.start();
+    }
 
+    private void GameOver() throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(new File("res/Game/GameOver.fxml").toURI().toURL());
+        AnchorPane gameOverBox = fxmlLoader.load();
+        Button playButton = (Button) gameOverBox.lookup("#playAgain");
+        playButton.setOnAction(event -> {
+            try {
+                createGame();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            stage.setScene(gameScene);
+        });
+
+        Button exitButton = (Button) gameOverBox.lookup("#Menu");
+        exitButton.setOnAction(event -> {
+            try {
+                createMenu();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            stage.setScene(menuScene);
+        });
+
+        gameOverScene = new Scene(gameOverBox);
     }
 
     public void update() {
@@ -136,7 +220,7 @@ public class BombermanGame extends Application {
             Scanner myReader = new Scanner(file);
             String line = myReader.nextLine();
             StringTokenizer token = new StringTokenizer(line);
-            int level = Integer.parseInt(token.nextToken());
+            level = Integer.parseInt(token.nextToken());
             int row = Integer.parseInt(token.nextToken());
             int col = Integer.parseInt(token.nextToken());
 
@@ -153,8 +237,15 @@ public class BombermanGame extends Application {
                         char characters = data.charAt(j);
                         switch (characters) {
                             case 'p': {
-                                Bomber obj = new Bomber(j, i, Sprite.player_right.getFxImage());
-                                entities.add(obj);
+                                if (bomber == null) {
+                                    Bomber obj = new Bomber(j, i, Sprite.player_right.getFxImage());
+                                    bomber = obj;
+                                    entities.add(obj);
+                                } else {
+                                    bomber.setX(j * Sprite.SCALED_SIZE);
+                                    bomber.setY(i * Sprite.SCALED_SIZE);
+                                    entities.add(bomber);
+                                }
                                 stillObjects.add(new Grass(j, i, Sprite.grass.getFxImage()));
                                 break;
                             }
@@ -205,6 +296,8 @@ public class BombermanGame extends Application {
                                 Portal obj = new Portal(j, i, Sprite.portal.getFxImage());
                                 stillObjects.add(new Grass(j, i, Sprite.grass.getFxImage()));
                                 stillObjects.add(obj);
+                                stillObjects.add(new Brick(j, i, Sprite.brick.getFxImage()));
+                                mapData[i][j] = '*';
                                 break;
                             }
 
@@ -216,6 +309,7 @@ public class BombermanGame extends Application {
                     }
                 }
             }
+            bomber.setMap(mapData);
             myReader.close();
         } catch (FileNotFoundException e) {
             System.out.println("An error occurred.");

@@ -11,7 +11,7 @@ public class BombItem extends Entity {
 
     @Override
     public void update() {
-        if(!isExist()){
+        if (!isExist()) {
             BombermanGame.getStillObjects().remove(this);
         }
     }

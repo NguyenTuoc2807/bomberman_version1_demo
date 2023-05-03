@@ -51,13 +51,15 @@ public abstract class Character extends Entity {
 
     public abstract void collisionHandling();
 
+    public void setMap(char[][] map) {
+        this.map = map;
+    }
+
     @Override
     public void update() {
         checkMove(x, y);
         // move
         x = moveX;
         y = moveY;
-        //collision handling
-        collisionHandling();
     }
 }

@@ -3,6 +3,8 @@ package uet.oop.bomberman.entities.Block;
 import javafx.scene.image.Image;
 import uet.oop.bomberman.BombermanGame;
 import uet.oop.bomberman.ControlGame.CollisionManager;
+import uet.oop.bomberman.Sound.Sound;
+import uet.oop.bomberman.entities.Character.Bomber;
 import uet.oop.bomberman.entities.Entity;
 import uet.oop.bomberman.entities.Explosion.*;
 import uet.oop.bomberman.graphics.Sprite;
@@ -13,6 +15,7 @@ public class Bomb extends Entity {
     private boolean explore = false;
     private int flameRange;
     public boolean explosionUp = true, explosionDown = true, explosionRight = true, explosionLeft = true;
+    CollisionManager collisionManager = new CollisionManager();
 
     public Bomb(int x, int y, Image img, int flameRange) {
         super(x, y, img);
@@ -20,9 +23,9 @@ public class Bomb extends Entity {
     }
 
     private void explode() {
-        CollisionManager collisionManager = new CollisionManager();
         int x = (int) Math.round((double) this.x / 32);
         int y = (int) Math.round((double) this.y / 32);
+        Sound.playSfx(Sound.explosion);
         Explosion explosion = new Explosion(x, y, Sprite.bomb_exploded.getFxImage());
         BombermanGame.getStillObjects().add(explosion);
         for (int i = 1; i <= flameRange; i++) {
@@ -127,13 +130,36 @@ public class Bomb extends Entity {
         img = Sprite.movingSprite(Sprite.bomb, Sprite.bomb_1, Sprite.bomb_2, BombermanGame.currentTime, 120).getFxImage();
     }
 
+    public void collisionHandling() {
+        int bombLeft = this.x;
+        int bombRight = this.x + 32;
+        int bombTop = this.y;
+        int bombBottom = this.y + 32;
+        for (Entity obj : BombermanGame.getEntities()) {
+            int objLeft = (int) obj.getX();
+            int objRight = (int) (obj.getX() + 32);
+            int objTop = (int) obj.getY();
+            int objBottom = (int) (obj.getY() + 32);
+            if (obj instanceof Bomber) {
+                if (bombRight > objLeft && bombLeft < objRight && bombBottom > objTop && bombTop < objBottom) {
+                    break;
+                } else {
+                    collisionManager.setMap(x / 32, y / 32, '#');
+                }
+            }
+
+        }
+    }
+
     @Override
     public void update() {
+        collisionHandling();
         animate();
         if (timeLeft > 0) {
             timeLeft--;
         } else {
             this.setExist(false);
+            collisionManager.setMap(x / 32, y / 32, ' ');
             setExplore(true);
             explode();
         }

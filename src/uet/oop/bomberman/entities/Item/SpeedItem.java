@@ -11,7 +11,7 @@ public class SpeedItem extends Entity {
 
     @Override
     public void update() {
-        if(!isExist()){
+        if (!isExist()) {
             BombermanGame.getStillObjects().remove(this);
         }
     }
