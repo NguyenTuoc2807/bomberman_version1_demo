@@ -23,14 +23,13 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import uet.oop.bomberman.ControlGame.LevelManager;
 import uet.oop.bomberman.Sound.Sound;
+import uet.oop.bomberman.entities.AI.Astar;
 import uet.oop.bomberman.entities.Block.Brick;
 import uet.oop.bomberman.entities.Block.Grass;
 import uet.oop.bomberman.entities.Block.Portal;
 import uet.oop.bomberman.entities.Block.Wall;
-import uet.oop.bomberman.entities.Character.Ballom;
-import uet.oop.bomberman.entities.Character.Bomber;
+import uet.oop.bomberman.entities.Character.*;
 import uet.oop.bomberman.entities.Character.Character;
-import uet.oop.bomberman.entities.Character.Oneal;
 import uet.oop.bomberman.entities.Entity;
 import uet.oop.bomberman.entities.Item.BombItem;
 import uet.oop.bomberman.entities.Item.FlameItem;
@@ -79,9 +78,6 @@ public class BombermanGame extends Application {
         createMenu();
         stage.setScene(menuScene);
         stage.show();
-        // TODO:
-        Sound.loadMedia();
-        Sound.playBackground(Sound.heading);
     }
 
     private void createMenu() throws IOException {
@@ -117,7 +113,7 @@ public class BombermanGame extends Application {
         canvas.setHeight(HEIGHT * Sprite.SCALED_SIZE);
         gc = canvas.getGraphicsContext2D();
         gameScene = new Scene(gameBox);
-        Sound.playSfx(Sound.ingame);
+        Sound.playSfx(Sound.inGame);
         // game initialization
         stillObjects.clear();
         entities.clear();
@@ -125,7 +121,7 @@ public class BombermanGame extends Application {
         createMap(levelManager.getLevel());
         // timer
         Timeline timeline = new Timeline();
-        time = 60;
+        time = 360;
         timeline.setCycleCount(Timeline.INDEFINITE);
         Label timerLabel = (Label) gameBox.lookup("#timer");
         Label livesLabel = (Label) gameBox.lookup("#lives");
@@ -324,6 +320,12 @@ public class BombermanGame extends Application {
                                 stillObjects.add(obj);
                                 stillObjects.add(new Brick(j, i, Sprite.brick.getFxImage()));
                                 mapData[i][j] = '*';
+                                break;
+                            }
+                            case '3': {
+                                Kondoria obj = new Kondoria(j, i, Sprite.kondoria_right1.getFxImage());
+                                stillObjects.add(new Grass(j,i,Sprite.grass.getFxImage()));
+                                entities.add((obj));
                                 break;
                             }
 

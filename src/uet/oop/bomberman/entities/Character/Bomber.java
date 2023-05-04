@@ -41,7 +41,7 @@ public class Bomber extends Character {
         this.speed = 1;
         this.bombLimit = 1;
         this.bombRange = 1;
-        this.lives = 1;
+        this.lives = 10;
     }
 
     public void placeBomb() {
