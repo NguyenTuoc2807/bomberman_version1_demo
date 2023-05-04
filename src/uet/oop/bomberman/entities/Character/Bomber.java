@@ -115,6 +115,22 @@ public class Bomber extends Character {
                     break;
                 }
             }
+
+            if (enemy instanceof Oneal) {
+                if (((Oneal) enemy).isDead()) {
+                    continue;
+                }
+                int enemyLeft = (int) enemy.getX();
+                int enemyRight = (int) (enemy.getX() + 32);
+                int enemyTop = (int) enemy.getY();
+                int enemyBottom = (int) (enemy.getY() + 32);
+
+                if (bomberRight > enemyLeft && bomberLeft < enemyRight && bomberBottom > enemyTop && bomberTop < enemyBottom) {
+                    lives--;
+                    isDead = true;
+                    break;
+                }
+            }
         }
 
         for (Entity obj : BombermanGame.getStillObjects()) {

@@ -30,6 +30,7 @@ import uet.oop.bomberman.entities.Block.Portal;
 import uet.oop.bomberman.entities.Block.Wall;
 import uet.oop.bomberman.entities.Character.*;
 import uet.oop.bomberman.entities.Character.Character;
+import uet.oop.bomberman.entities.Character.Oneal;
 import uet.oop.bomberman.entities.Entity;
 import uet.oop.bomberman.entities.Item.BombItem;
 import uet.oop.bomberman.entities.Item.FlameItem;
@@ -238,7 +239,8 @@ public class BombermanGame extends Application {
             level = Integer.parseInt(token.nextToken());
             int row = Integer.parseInt(token.nextToken());
             int col = Integer.parseInt(token.nextToken());
-
+            height = row;
+            width = col;
             mapData = new char[row][col];
             for (int i = 0; i < row; i++) {
                 for (int j = 0; j < col; j++) {

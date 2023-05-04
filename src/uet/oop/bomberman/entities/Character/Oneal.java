@@ -23,6 +23,15 @@ public class Oneal extends Character {
     public long timeDead = 300;
     public int randomNumber = 1;
     public String direction = "RIGHT";
+    public boolean isDead = false;
+
+    public boolean isDead() {
+        return isDead;
+    }
+
+    public void setDead(boolean dead) {
+        isDead = dead;
+    }
 
     public Oneal(int x, int y, Image img) {
         super(x, y, img);
@@ -95,22 +104,26 @@ public class Oneal extends Character {
         if (canBeRedirected(this.x, this.y)) {
             Node start = new Node(this.y / 32, this.x / 32);
             Node end = new Node((int)bomber.getY()/32, (int)bomber.getX()/32);
-
+            //System.out.println(start.getRow() + " " + start.getCol());
+            System.out.println(end.getRow() + " " + end.getCol());
             Astar astar = new Astar(height, width, start, end);
             int[][] blocksArray = new int[width * height][2];
             int countBlock = 0;
 
-            for (int i = 0; i < height; i++)
+            for (int i = 0; i < height; i++) {
                 for (int j = 0; j < width; j++)
-                    if (map[i][j] != ' ') {
+                    if (getMapData()[i][j] != ' ') {
                         blocksArray[countBlock][0] = i;
                         blocksArray[countBlock][1] = j;
                         countBlock++;
                     }
-
+            }
             astar.setBlocks(blocksArray,countBlock);
             List<Node> path = astar.findPath();
-            if (path.size() > 0) {
+            for (Node node : path) {
+                System.out.println(node.toString());
+            }
+            if (path.size() > 1) {
                 int nxtX = path.get(1).getCol();
                 int nxtY = path.get(1).getRow();
                 ;
@@ -159,6 +172,7 @@ public class Oneal extends Character {
                 timeMove = 4;
             }
         } else {
+            isDead = true;
             if (timeDead > 0) {
                 if (timeDead >= 200) {
                     changeAnimation("DEAD");

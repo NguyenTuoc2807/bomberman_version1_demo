@@ -6,73 +6,19 @@ import java.util.Objects;
 
 public class Node {
     private int g;
-    private int f;
     private int h;
+    private int f;
     private int row;
     private int col;
     private boolean isBlock;
     private Node parent;
 
-    public Node(int row, int col) {
-        super();
-        this.row = row;
-        this.col = col;
-    }
-
-    public void calculateHeuristic(Node finalNode) {
-        this.h = Math.abs(finalNode.getRow() - getRow()) + Math.abs(finalNode.getCol() - getCol());
-    }
-
-    public void setNodeData(Node currentNode) {
-        int gCost = currentNode.getG();
-        setParent(currentNode);
-        setG(gCost);
-        calculateFinalCost();
-    }
-
-    public boolean checkBetterPath(Node currentNode) {
-        int gCost = currentNode.getG();
-        if (gCost < getG()) {
-            setNodeData(currentNode);
-            return true;
-        }
-        return false;
-    }
-
-    private void calculateFinalCost() {
-        int finalCost = getG() + getH();
-        setF(finalCost);
-    }
-
-    @Override
-    public boolean equals(Object arg0) {
-        Node other = (Node) arg0;
-        return this.getRow() == other.getRow() && this.getCol() == other.getCol();
-    }
-
-    @Override
-    public String toString() {
-        return "Node [row=" + row + ", col=" + col + "]";
-    }
-
-    public int getH() {
-        return h;
-    }
-
     public void setH(int h) {
         this.h = h;
     }
 
-    public int getG() {
-        return g;
-    }
-
     public void setG(int g) {
         this.g = g;
-    }
-
-    public int getF() {
-        return f;
     }
 
     public void setF(int f) {
@@ -83,6 +29,18 @@ public class Node {
         return parent;
     }
 
+    public int getG() {
+        return g;
+    }
+
+    public int getH() {
+        return h;
+    }
+
+    public int getF() {
+        return f;
+    }
+
     public void setParent(Node parent) {
         this.parent = parent;
     }
@@ -91,24 +49,58 @@ public class Node {
         return isBlock;
     }
 
-    public void setBlock(boolean isBlock) {
-        this.isBlock = isBlock;
+    public int getCol() {
+        return col;
     }
 
     public int getRow() {
         return row;
     }
 
-    public void setRow(int row) {
-        this.row = row;
-    }
-
-    public int getCol() {
-        return col;
+    public void setBlock(boolean block) {
+        isBlock = block;
     }
 
     public void setCol(int col) {
         this.col = col;
+    }
+
+    public void setRow(int row) {
+        this.row = row;
+    }
+
+    public Node(int row, int col) {
+        super();
+        this.row = row;
+        this.col = col;
+    }
+
+    public void setHeuristic(Node endNode) {
+        this.h = Math.abs(endNode.getRow() - this.getRow()) + Math.abs(endNode.getCol() - this.getCol());
+    }
+
+    public void setDataNode(Node curr) {
+        setParent(curr);
+        setG(curr.getG());
+        setCost();
+    }
+
+    public void setCost() {
+        setF(getG() + getH());
+    }
+
+    public boolean equals(Object obj) {
+        Node other = (Node)obj;
+        return other.getRow() == this.getRow() && other.getCol() == this.getCol();
+    }
+
+    public boolean isBetterPath(Node curr) {
+        int gcost = curr.getG();
+        if (gcost < getG()) {
+            setDataNode(curr);
+            return true;
+        }
+        return false;
     }
 
 }

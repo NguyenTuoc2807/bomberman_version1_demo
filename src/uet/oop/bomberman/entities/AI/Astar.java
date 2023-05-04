@@ -5,136 +5,130 @@ import javafx.util.Pair;
 import java.util.*;
 
 public class Astar {
-    private Node[][] searchArea;
-    private PriorityQueue<Node> openList;
-    private Set<Node> closedSet;
-    private Node initialNode;
-    private Node finalNode;
+    private Node[][] search;
+    private PriorityQueue<Node> lst;
+    private Set<Node> closed;
+    private Node startnode;
+    private Node endnode;
 
-    public Astar(int rows, int cols, Node initialNode, Node finalNode) {
-        setInitialNode(initialNode);
-        setFinalNode(finalNode);
-        this.searchArea = new Node[rows][cols];
-        this.openList = new PriorityQueue<>(Comparator.comparingInt(Node::getF));
+    public void setLst(PriorityQueue<Node> lst) {
+        this.lst = lst;
+    }
+
+    public Set<Node> getClosed() {
+        return closed;
+    }
+
+    public PriorityQueue<Node> getLst() {
+        return lst;
+    }
+
+    public void setClosed(Set<Node> closed) {
+        this.closed = closed;
+    }
+
+    public Node getEndnode() {
+        return endnode;
+    }
+
+    public Node getStartnode() {
+        return startnode;
+    }
+
+    public Node[][] getSearch() {
+        return search;
+    }
+
+    public void setEndnode(Node endnode) {
+        this.endnode = endnode;
+    }
+
+    public void setSearch(Node[][] search) {
+        this.search = search;
+    }
+
+    public void setStartnode(Node startnode) {
+        this.startnode = startnode;
+    }
+
+    public Astar(int rows, int cols, Node startnode, Node endnode) {
+        this.search = new Node[rows][cols];
+        this.startnode = startnode;
+        this.endnode = endnode;
+        this.lst = new PriorityQueue<Node>(new Comparator<Node>() {
+            @Override
+            public int compare(Node o1, Node o2) {
+                return Integer.compare(o1.getF(), o2.getF());
+            }
+        });
         setNodes();
-        this.closedSet = new HashSet<>();
+        this.closed = new HashSet<>();
+
     }
 
     private void setNodes() {
-        for (int i = 0; i < searchArea.length; i++) {
-            for (int j = 0; j < searchArea[0].length; j++) {
-                Node node = new Node(i, j);
-                node.calculateHeuristic(getFinalNode());
-                this.searchArea[i][j] = node;
+        for (int i = 0; i < search.length; i++) {
+            for (int j = 0; j < search[0].length; j++) {
+                Node tmp = new Node(i,j);
+                tmp.setHeuristic(getEndnode());
+                this.search[i][j] = tmp;
             }
         }
     }
 
-    public void setBlocks(int[][] blocksArray, int count) {
-        for (int i = 0; i < count; i++) {
-            int row = blocksArray[i][0];
-            int col = blocksArray[i][1];
-            setBlock(row, col);
+    public void setBlocks(int [][] idBlock, int sz) {
+        for (int i = 0; i < sz; i++) {
+            this.search[idBlock[i][0]][idBlock[i][1]].setBlock(true);
         }
     }
 
     public List<Node> findPath() {
-        openList.add(initialNode);
+        lst.add(startnode);
         int []d = new int[]{0,1,0,-1,0};
-        while (!isEmpty(openList)) {
-            Node currentNode = openList.poll();
-            closedSet.add(currentNode);
-            assert currentNode != null;
-            if (isFinalNode(currentNode)) {
+        while(!lst.isEmpty()) {
+            Node curr = lst.poll();
+            closed.add(curr);
+            if (curr.equals(endnode)) {
                 List<Node> path = new ArrayList<Node>();
-                path.add(currentNode);
+                path.add(curr);
                 Node parent;
-                while ((parent = currentNode.getParent()) != null) {
+                while((parent = curr.getParent()) != null) {
                     path.add(0, parent);
-                    currentNode = parent;
+                    curr = parent;
                 }
                 return path;
             } else {
-                int row = currentNode.getRow();
-                int col = currentNode.getCol();
+                int row = curr.getRow();
+                int col = curr.getCol();
                 for (int i = 0; i < 4; i++) {
                     int nrow = row + d[i];
                     int ncol = col + d[i+1];
-                    if (Math.min(ncol, nrow) >= 0 && nrow < getSearchArea().length && ncol < getSearchArea()[0].length) {
-                        checkNode(currentNode, ncol, nrow);
+                    if (Math.min(ncol, nrow) >= 0 && nrow < getSearch().length && ncol < getSearch()[0].length) {
+                        checkNode(curr, ncol, nrow);
                     }
                 }
             }
+
         }
         return new ArrayList<Node>();
     }
 
+
     private void checkNode(Node currentNode, int col, int row) {
-        Node adjacentNode = getSearchArea()[row][col];
-        if (!adjacentNode.isBlock() && !getClosedSet().contains(adjacentNode)) {
-            if (!getOpenList().contains(adjacentNode)) {
-                adjacentNode.setNodeData(currentNode);
-                getOpenList().add(adjacentNode);
+        Node adjacentNode = getSearch()[row][col];
+        if (!adjacentNode.isBlock() && !getClosed().contains(adjacentNode)) {
+            if (!getLst().contains(adjacentNode)) {
+                adjacentNode.setDataNode(currentNode);
+                getLst().add(adjacentNode);
             } else {
-                boolean changed = adjacentNode.checkBetterPath(currentNode);
+                boolean changed = adjacentNode.isBetterPath(currentNode);
                 if (changed) {
-                    getOpenList().remove(adjacentNode);
-                    getOpenList().add(adjacentNode);
+                    getLst().remove(adjacentNode);
+                    getLst().add(adjacentNode);
                 }
             }
         }
     }
 
-    private boolean isFinalNode(Node currentNode) {
-        return currentNode.equals(finalNode);
-    }
-
-    private boolean isEmpty(PriorityQueue<Node> openList) {
-        return openList.size() == 0;
-    }
-
-    private void setBlock(int row, int col) {
-        this.searchArea[row][col].setBlock(true);
-    }
-
-    public Node getInitialNode() {
-        return initialNode;
-    }
-
-    public void setInitialNode(Node initialNode) {
-        this.initialNode = initialNode;
-    }
-
-    public Node getFinalNode() {
-        return finalNode;
-    }
-
-    public void setFinalNode(Node finalNode) {
-        this.finalNode = finalNode;
-    }
-
-    public Node[][] getSearchArea() {
-        return searchArea;
-    }
-
-    public void setSearchArea(Node[][] searchArea) {
-        this.searchArea = searchArea;
-    }
-
-    public PriorityQueue<Node> getOpenList() {
-        return openList;
-    }
-
-    public void setOpenList(PriorityQueue<Node> openList) {
-        this.openList = openList;
-    }
-
-    public Set<Node> getClosedSet() {
-        return closedSet;
-    }
-
-    public void setClosedSet(Set<Node> closedSet) {
-        this.closedSet = closedSet;
-    }
 
 }
