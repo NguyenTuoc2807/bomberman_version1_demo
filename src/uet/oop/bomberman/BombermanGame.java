@@ -79,6 +79,7 @@ public class BombermanGame extends Application {
         createMenu();
         stage.setScene(menuScene);
         stage.show();
+        stage.setResizable(false);
     }
 
     private void createMenu() throws IOException {

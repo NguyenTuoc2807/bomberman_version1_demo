@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane prefHeight="416.0" prefWidth="922.0" styleClass="body" stylesheets="@Image/Dead.css" xmlns="http://javafx.com/javafx/8.0.361" xmlns:fx="http://javafx.com/fxml/1" fx:controller="uet.oop.bomberman.BombermanGame">
+   <children>
+      <Button id="quitend" layoutX="444.0" layoutY="336.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="65.0" text="Quit" />
+      <Button id="continuegame" layoutX="426.0" layoutY="296.0" mnemonicParsing="false" text="Continue" />
+      <ImageView fitHeight="282.0" fitWidth="510.0" layoutX="210.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@Image/gameover1.jpg" />
+         </image>
+      </ImageView>
+   </children>
+</AnchorPane>
