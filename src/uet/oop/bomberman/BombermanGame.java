@@ -4,13 +4,21 @@ import javafx.animation.AnimationTimer;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.VPos;
+import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.media.MediaPlayer;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import uet.oop.bomberman.ControlGame.LevelManager;
@@ -22,6 +30,7 @@ import uet.oop.bomberman.entities.Block.Wall;
 import uet.oop.bomberman.entities.Character.Ballom;
 import uet.oop.bomberman.entities.Character.Bomber;
 import uet.oop.bomberman.entities.Character.Character;
+import uet.oop.bomberman.entities.Character.Oneal;
 import uet.oop.bomberman.entities.Entity;
 import uet.oop.bomberman.entities.Item.BombItem;
 import uet.oop.bomberman.entities.Item.FlameItem;
@@ -35,6 +44,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.StringTokenizer;
+
+//import static uet.oop.bomberman.Sound.media;
 
 public class BombermanGame extends Application {
     public static final int WIDTH = 31;
@@ -53,8 +64,10 @@ public class BombermanGame extends Application {
 
     public static long currentTime;
     private int time;
-    private Bomber bomber;
+    public static Bomber bomber;
     private int level;
+    public static int height;
+    public static int width;
 
     public static void main(String[] args) {
         Application.launch(BombermanGame.class);
@@ -66,6 +79,9 @@ public class BombermanGame extends Application {
         createMenu();
         stage.setScene(menuScene);
         stage.show();
+        // TODO:
+        Sound.loadMedia();
+        Sound.playBackground(Sound.heading);
     }
 
     private void createMenu() throws IOException {
@@ -101,7 +117,7 @@ public class BombermanGame extends Application {
         canvas.setHeight(HEIGHT * Sprite.SCALED_SIZE);
         gc = canvas.getGraphicsContext2D();
         gameScene = new Scene(gameBox);
-        Sound.playInGame();
+        Sound.playSfx(Sound.ingame);
         // game initialization
         stillObjects.clear();
         entities.clear();
@@ -292,6 +308,13 @@ public class BombermanGame extends Application {
                                 Ballom obj = new Ballom(j, i, Sprite.balloom_right1.getFxImage());
                                 stillObjects.add(new Grass(j, i, Sprite.grass.getFxImage()));
                                 entities.add(obj);
+                                break;
+                            }
+
+                            case '2': {
+                                Oneal oneal = new Oneal(j,i,Sprite.oneal_right1.getFxImage());
+                                stillObjects.add(new Grass(j,i,Sprite.grass.getFxImage()));
+                                entities.add((oneal));
                                 break;
                             }
 
