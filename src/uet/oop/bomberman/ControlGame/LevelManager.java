@@ -10,8 +10,11 @@ public class LevelManager {
     private int currentLevel = 0;
 
     public LevelManager() {
-        level.add("res/levels/level0.txt");
+        level.add("res/levels/level1.txt");
         level.add("res/levels/level2.txt");
+        level.add("res/levels/level3.txt");
+        level.add("res/levels/level4.txt");
+        level.add("res/levels/level5.txt");
     }
 
     public String getLevel() {

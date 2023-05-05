@@ -30,11 +30,11 @@ public abstract class Entity {
     }
 
     public void setX(int x) {
-        this.x = x;
+        this.x = x * Sprite.SCALED_SIZE;
     }
 
     public void setY(int y) {
-        this.y = y;
+        this.y = y * Sprite.SCALED_SIZE;
     }
 
     public void setImg(Image img) {

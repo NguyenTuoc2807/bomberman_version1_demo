@@ -14,7 +14,6 @@ import java.util.Random;
 public class Ballom extends Character {
     public long timeMove = 5;
     public long timeDead = 300;
-    private boolean isDead = false;
     public int randomNumber = 1;
     public String direction = "RIGHT";
 
@@ -84,9 +83,6 @@ public class Ballom extends Character {
         img = Sprite.movingSprite(Sprite.mob_dead1, Sprite.mob_dead2, Sprite.mob_dead3, BombermanGame.currentTime / 100, 60).getFxImage();
     }
 
-    public boolean isDead() {
-        return isDead;
-    }
 
     @Override
     public void update() {

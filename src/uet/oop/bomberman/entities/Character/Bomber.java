@@ -41,7 +41,7 @@ public class Bomber extends Character {
         this.speed = 1;
         this.bombLimit = 1;
         this.bombRange = 1;
-        this.lives = 10;
+        this.lives = 3;
     }
 
     public void placeBomb() {
@@ -94,30 +94,14 @@ public class Bomber extends Character {
 
     @Override
     public void collisionHandling() {
-        int bomberLeft = this.x;
-        int bomberRight = this.x + 32;
-        int bomberTop = this.y;
-        int bomberBottom = this.y + 32;
+        int bomberLeft = this.x + 5;
+        int bomberRight = this.x + 25;
+        int bomberTop = this.y + 5;
+        int bomberBottom = this.y + 25;
         //check collision
         for (Character enemy : BombermanGame.getEntities()) {
-            if (enemy instanceof Ballom) {
-                if (((Ballom) enemy).isDead()) {
-                    continue;
-                }
-                int enemyLeft = (int) enemy.getX();
-                int enemyRight = (int) (enemy.getX() + 32);
-                int enemyTop = (int) enemy.getY();
-                int enemyBottom = (int) (enemy.getY() + 32);
-
-                if (bomberRight > enemyLeft && bomberLeft < enemyRight && bomberBottom > enemyTop && bomberTop < enemyBottom) {
-                    lives--;
-                    isDead = true;
-                    break;
-                }
-            }
-
-            if (enemy instanceof Oneal) {
-                if (((Oneal) enemy).isDead()) {
+            if (enemy instanceof Ballom || enemy instanceof Oneal) {
+                if (enemy.isDead()) {
                     continue;
                 }
                 int enemyLeft = (int) enemy.getX();
@@ -140,7 +124,7 @@ public class Bomber extends Character {
             int objBottom = (int) (obj.getY() + 25);
 
             if (bomberRight > objLeft && bomberLeft < objRight && bomberBottom > objTop && bomberTop < objBottom) {
-                if (obj instanceof Portal) {
+                if (obj instanceof Portal && BombermanGame.getEntities().size() == 1) {
                     isNextLevel = true;
                     break;
                 }
@@ -256,6 +240,10 @@ public class Bomber extends Character {
         return score;
     }
 
+    public void setScore(int score) {
+        this.score = score;
+    }
+
     public boolean isNextLevel() {
         return isNextLevel;
     }
@@ -263,9 +251,20 @@ public class Bomber extends Character {
     public void setNextLevel(boolean nextLevel) {
         isNextLevel = nextLevel;
     }
+    public void reset() {
+        wPressed.set(false);
+        aPressed.set(false);
+        sPressed.set(false);
+        dPressed.set(false);
+        moveX = x;
+        moveY = y;
+    }
 
     @Override
     public void update() {
+        if(lives == 0){
+            isDead = true;
+        }
         if (lives > 0 && !isDead) {
             control();
             super.update();

@@ -8,21 +8,16 @@ import java.io.File;
 
 public class Sound {
     public static Media inGame = new Media(new File("res/sound/ingame.mp3").toURI().toString());
-    public static AudioClip level;
+    public static AudioClip level = new AudioClip(new File("res/Sound/level.wav").toURI().toString());
     public static AudioClip placeBomb = new AudioClip(new File("res/sound/placebomb.wav").toURI().toString());
 
     public static AudioClip explosion = new AudioClip(new File("res/sound/explosion.wav").toURI().toString());
     public static Media heading = new Media(new File("res/sound/heading.mp3").toURI().toString());
     public static AudioClip die = new AudioClip(new File("res/sound/die.wav").toURI().toString());
     public static AudioClip takePower = new AudioClip(new File("res/sound/takepower.wav").toURI().toString());
-    public static AudioClip ingame;
 
-    private static MediaPlayer headingPlayer = new MediaPlayer(heading);
-    private static MediaPlayer inGamePlayer = new MediaPlayer(inGame);
-
-    /**public static void playSfx(AudioClip audioClip) {
-        audioClip.play();
-    } */
+    private static final MediaPlayer headingPlayer = new MediaPlayer(heading);
+    private static final MediaPlayer inGamePlayer = new MediaPlayer(inGame);
 
     public static void playSfx(Media media) {
         MediaPlayer mediaPlayer = new MediaPlayer(media);
@@ -48,9 +43,4 @@ public class Sound {
         inGamePlayer.stop();
     }
 
-    public static void loadMedia() {
-    }
-
-    public static void playBackground(Media heading) {
-    }
 }

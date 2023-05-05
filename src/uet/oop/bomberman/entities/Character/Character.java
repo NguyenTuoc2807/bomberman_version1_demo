@@ -10,6 +10,7 @@ public abstract class Character extends Entity {
     public boolean isMoving = false;
     public int lives;
     public int speed;
+    public boolean isDead = false;
     public char[][] map = BombermanGame.getMapData();
 
     public Character(int xUnit, int yUnit, Image img) {
@@ -55,9 +56,12 @@ public abstract class Character extends Entity {
         this.map = map;
     }
 
+    public boolean isDead() {
+        return isDead;
+    }
+
     @Override
     public void update() {
-        checkMove(x, y);
         // move
         x = moveX;
         y = moveY;

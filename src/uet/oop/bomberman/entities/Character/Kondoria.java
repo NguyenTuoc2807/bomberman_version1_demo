@@ -7,8 +7,14 @@ import uet.oop.bomberman.entities.Entity;
 import uet.oop.bomberman.entities.Explosion.Explosion;
 import uet.oop.bomberman.graphics.Sprite;
 
+import java.util.Random;
+
 public class Kondoria extends Character{
     // Nhân vật có thể đi trườn qua tường
+    public long timeMove = 5;
+    public long timeDead = 300;
+    public int randomNumber = 1;
+    public String direction = "RIGHT";
     public Kondoria(int xUnit, int yUnit, Image img) {
         super(xUnit, yUnit, img);
         lives = 2;
@@ -44,8 +50,8 @@ public class Kondoria extends Character{
         int yTop = (int) ((tileY + diff) / Sprite.SCALED_SIZE);
         int yBottom = (int) ((tileY + Sprite.SCALED_SIZE - diff) / Sprite.SCALED_SIZE);
         //check move
-        isMoving = map[yTop][xLeft] == ' ' && map[yTop][xRight] == ' ' && map[yBottom][xLeft] == ' ' && map[yBottom][xRight] == ' '
-                && map[yTop][xLeft] == '*' && map[yTop][xRight] == '*' && map[yBottom][xLeft] == '*' && map[yBottom][xRight] == '*';
+        isMoving = (map[yTop][xLeft] == ' ' || map[yTop][xLeft] == '*') && (map[yTop][xRight] == ' ' || map[yTop][xRight] == '*')
+                && (map[yBottom][xLeft] == ' ' || map[yBottom][xLeft] == '*') && (map[yBottom][xRight] == ' ' || map[yBottom][xRight] == '*');
     }
 
     @Override
@@ -68,8 +74,48 @@ public class Kondoria extends Character{
             }
         }
     }
+    public boolean canBeRedirected(int x, int y) {
+        return x % 32 == 0 && y % 32 == 0;
+    }
+    public void animateDead() {
+        img = Sprite.movingSprite(Sprite.mob_dead1, Sprite.mob_dead2, Sprite.mob_dead3, BombermanGame.currentTime / 100, 60).getFxImage();
+    }
     @Override
     public void update() {
-
+        if (canBeRedirected(x, y)) {
+            Random r = new Random();
+            randomNumber = r.nextInt(4) + 1;
+            if (randomNumber == 1) {
+                direction = "LEFT";
+            } else if (randomNumber == 2) {
+                direction = "RIGHT";
+            } else if (randomNumber == 3) {
+                direction = "UP";
+            } else {
+                direction = "DOWN";
+            }
+        }
+        if (lives > 0) {
+            if (timeMove > 0) {
+                timeMove--;
+            } else {
+                move(direction);
+                changeAnimation(direction);
+                timeMove = 5;
+            }
+        } else {
+            isDead = true;
+            if (timeDead > 0) {
+                if (timeDead >= 200) {
+                    changeAnimation("DEAD");
+                }
+                timeDead--;
+                animateDead();
+            } else {
+                setExist(false);
+            }
+        }
+        super.update();
+        collisionHandling();
     }
 }
