@@ -144,7 +144,7 @@ public class Bomb extends Entity {
                 if (bombRight > objLeft && bombLeft < objRight && bombBottom > objTop && bombTop < objBottom) {
                     break;
                 } else {
-                    collisionManager.setMap(x / 32, y / 32, '#');
+                    collisionManager.setMap(x / 32, y / 32, '%');
                 }
             }
 

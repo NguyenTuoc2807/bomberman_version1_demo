@@ -20,12 +20,9 @@ import uet.oop.bomberman.entities.Block.Grass;
 import uet.oop.bomberman.entities.Block.Portal;
 import uet.oop.bomberman.entities.Block.Wall;
 import uet.oop.bomberman.entities.Character.*;
-import uet.oop.bomberman.entities.Character.Character;
 import uet.oop.bomberman.entities.Character.Oneal;
 import uet.oop.bomberman.entities.Entity;
-import uet.oop.bomberman.entities.Item.BombItem;
-import uet.oop.bomberman.entities.Item.FlameItem;
-import uet.oop.bomberman.entities.Item.SpeedItem;
+import uet.oop.bomberman.entities.Item.*;
 import uet.oop.bomberman.graphics.Sprite;
 
 import java.io.File;
@@ -49,7 +46,7 @@ public class BombermanGame extends Application {
     private AnimationTimer timer;
     private Timeline timeline;
     private LevelManager levelManager = new LevelManager();
-    private static List<Character> entities = new ArrayList<>();
+    private static List<Entity> entities = new ArrayList<>();
     private static List<Entity> stillObjects = new ArrayList<>();
     private static char[][] mapData;
     private long startTime;
@@ -125,7 +122,7 @@ public class BombermanGame extends Application {
         KeyFrame keyFrame = new KeyFrame(Duration.seconds(1), event -> {
             time--;
             if (time >= 0) {
-                timerLabel.setText(String.format("%02d:%02d", time / 60, time % 60));
+                timerLabel.setText(String.format("Time: %02d:%02d", time / 60, time % 60));
                 livesLabel.setText(String.format("Lives: %d", bomber.getLives()));
                 scoreLabel.setText(String.format("Score: %d", bomber.getScore()));
                 levelLabel.setText(String.format("Level: %d", level));
@@ -150,7 +147,7 @@ public class BombermanGame extends Application {
                     }
                 }
                 // is game over
-                if (bomber.isDead() || time == 0) {
+                if (bomber.getLives() == 0 || time == 0) {
                     try {
                         GameOver();
                     } catch (IOException e) {
@@ -223,7 +220,7 @@ public class BombermanGame extends Application {
 
     public void update() {
         List<Entity> stillObjectsCopy = new ArrayList<>(stillObjects);
-        List<Character> entitiesCopy = new ArrayList<>(entities);
+        List<Entity> entitiesCopy = new ArrayList<>(entities);
         for (Entity obj : stillObjectsCopy) {
             if (obj.isExist()) {
                 obj.update();
@@ -231,12 +228,14 @@ public class BombermanGame extends Application {
                 stillObjects.remove(obj);
             }
         }
-        for (Character obj : entitiesCopy) {
+        for (Entity obj : entitiesCopy) {
             if (obj.isExist()) {
                 obj.update();
             } else {
                 entities.remove(obj);
-                bomber.setScore(bomber.getScore() + 10);
+                if(obj instanceof Enemy){
+                    bomber.setScore(bomber.getScore() + ((Enemy) obj).getScore());
+                }
             }
         }
     }
@@ -322,6 +321,31 @@ public class BombermanGame extends Application {
                                 break;
                             }
 
+                            case 'B': {
+                                Entity obj = new BombPassItem(j, i, Sprite.powerup_bombpass.getFxImage());
+                                stillObjects.add(new Grass(j, i, Sprite.grass.getFxImage()));
+                                stillObjects.add(obj);
+                                stillObjects.add(new Brick(j, i, Sprite.brick.getFxImage()));
+                                mapData[i][j] = '*';
+                                break;
+                            }
+                            case 'F': {
+                                Entity obj = new FlamePassItem(j, i, Sprite.powerup_flamepass.getFxImage());
+                                stillObjects.add(new Grass(j, i, Sprite.grass.getFxImage()));
+                                stillObjects.add(obj);
+                                stillObjects.add(new Brick(j, i, Sprite.brick.getFxImage()));
+                                mapData[i][j] = '*';
+                                break;
+                            }
+                            case 'W': {
+                                Entity obj = new WallPassItem(j, i, Sprite.powerup_wallpass.getFxImage());
+                                stillObjects.add(new Grass(j, i, Sprite.grass.getFxImage()));
+                                stillObjects.add(obj);
+                                stillObjects.add(new Brick(j, i, Sprite.brick.getFxImage()));
+                                mapData[i][j] = '*';
+                                break;
+                            }
+
                             case '1': {
                                 Ballom obj = new Ballom(j, i, Sprite.balloom_right1.getFxImage());
                                 stillObjects.add(new Grass(j, i, Sprite.grass.getFxImage()));
@@ -390,7 +414,7 @@ public class BombermanGame extends Application {
         return stillObjects;
     }
 
-    public static List<Character> getEntities() {
+    public static List<Entity> getEntities() {
         return entities;
     }
 

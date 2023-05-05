@@ -9,16 +9,11 @@ import uet.oop.bomberman.graphics.Sprite;
 import java.util.Random;
 
 
-public class Minvo extends Character {
-    public long timeMove = 5;
-    public long timeDead = 300;
-    public int randomNumber = 1;
-    public String direction = "RIGHT";
-
+public class Minvo extends Enemy {
     public Minvo(int x, int y, Image img) {
         super(x, y, img);
         speed = 1;
-        lives = 3;
+        score = 800;
     }
 
     @Override
@@ -66,24 +61,14 @@ public class Minvo extends Character {
             int objBottom = (int) (obj.getY() + 32);
             if (objLeft < enemyRight && objRight > enemyLeft && objTop < enemyBottom && objBottom > enemyTop) {
                 if (obj instanceof Explosion) {
-                    lives--;
+                    isDead = true;
                     break;
                 }
             }
         }
     }
 
-    public boolean canBeRedirected(int x, int y) {
-        return x % 32 == 0 && y % 32 == 0;
-    }
-
-    public void animateDead() {
-        img = Sprite.movingSprite(Sprite.mob_dead1, Sprite.mob_dead2, Sprite.mob_dead3, BombermanGame.currentTime / 100, 60).getFxImage();
-    }
-
-
-    @Override
-    public void update() {
+    public void characterMove() {
         if (canBeRedirected(x, y)) {
             Random r = new Random();
             randomNumber = r.nextInt(4) + 1;
@@ -97,28 +82,11 @@ public class Minvo extends Character {
                 direction = "DOWN";
             }
         }
-        if (lives > 0) {
-            if (timeMove > 0) {
-                timeMove--;
-            } else {
-                move(direction);
-                changeAnimation(direction);
-                timeMove = 5;
-            }
-        } else {
-            isDead = true;
-            if (timeDead > 0) {
-                if (timeDead >= 200) {
-                    changeAnimation("DEAD");
-                }
-                timeDead--;
-                animateDead();
-            } else {
-                setExist(false);
-            }
-        }
+    }
+
+    @Override
+    public void update() {
         super.update();
-        collisionHandling();
     }
 
 }

@@ -4,16 +4,15 @@ import javafx.scene.image.Image;
 import uet.oop.bomberman.BombermanGame;
 import uet.oop.bomberman.entities.Entity;
 
-public abstract class Character extends Entity {
+public abstract class Player extends Entity {
     public int moveX = x;
     public int moveY = y;
     public boolean isMoving = false;
     public int lives;
     public int speed;
-    public boolean isDead = false;
     public char[][] map = BombermanGame.getMapData();
 
-    public Character(int xUnit, int yUnit, Image img) {
+    public Player(int xUnit, int yUnit, Image img) {
         super(xUnit, yUnit, img);
     }
 
@@ -54,10 +53,6 @@ public abstract class Character extends Entity {
 
     public void setMap(char[][] map) {
         this.map = map;
-    }
-
-    public boolean isDead() {
-        return isDead;
     }
 
     @Override

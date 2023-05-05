@@ -14,16 +14,11 @@ import java.util.Random;
 import static uet.oop.bomberman.BombermanGame.*;
 
 
-public class Oneal extends Character {
-    public long timeMove = 5;
-    public long timeDead = 300;
-    public int randomNumber = 1;
-    public String direction = "RIGHT";
-
+public class Oneal extends Enemy {
     public Oneal(int x, int y, Image img) {
         super(x, y, img);
         speed = 2;
-        lives = 1;
+        score = 200;
     }
 
     @Override
@@ -71,22 +66,15 @@ public class Oneal extends Character {
             int objBottom = (int) (obj.getY() + 32);
             if (objLeft < enemyRight && objRight > enemyLeft && objTop < enemyBottom && objBottom > enemyTop) {
                 if (obj instanceof Explosion) {
-                    lives--;
+                    isDead = true;
                     break;
                 }
             }
         }
     }
 
-    public boolean canBeRedirected(int x, int y) {
-        return x % 32 == 0 && y % 32 == 0;
-    }
-
-    public void animateDead() {
-        img = Sprite.movingSprite(Sprite.mob_dead1, Sprite.mob_dead2, Sprite.mob_dead3, BombermanGame.currentTime / 100, 60).getFxImage();
-    }
-
-    public void onealMove() {
+    @Override
+    public void characterMove() {
         if (canBeRedirected(this.x, this.y)) {
             Node start = new Node(this.y / 32, this.x / 32);
             Node end = new Node((int) bomber.getY() / 32, (int) bomber.getX() / 32);
@@ -141,29 +129,7 @@ public class Oneal extends Character {
 
     @Override
     public void update() {
-        onealMove();
-        if (lives > 0) {
-            if (timeMove > 0) {
-                timeMove--;
-            } else {
-                move(direction);
-                changeAnimation(direction);
-                timeMove = 4;
-            }
-        } else {
-            isDead = true;
-            if (timeDead > 0) {
-                if (timeDead >= 200) {
-                    changeAnimation("DEAD");
-                }
-                timeDead--;
-                animateDead();
-            } else {
-                setExist(false);
-            }
-        }
         super.update();
-        collisionHandling();
     }
 
 }

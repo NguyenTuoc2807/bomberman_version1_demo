@@ -2,23 +2,18 @@ package uet.oop.bomberman.entities.Character;
 
 import javafx.scene.image.Image;
 import uet.oop.bomberman.BombermanGame;
-import uet.oop.bomberman.entities.Block.Bomb;
 import uet.oop.bomberman.entities.Entity;
 import uet.oop.bomberman.entities.Explosion.Explosion;
 import uet.oop.bomberman.graphics.Sprite;
 
 import java.util.Random;
 
-public class Kondoria extends Character{
+public class Kondoria extends Enemy{
     // Nhân vật có thể đi trườn qua tường
-    public long timeMove = 5;
-    public long timeDead = 300;
-    public int randomNumber = 1;
-    public String direction = "RIGHT";
     public Kondoria(int xUnit, int yUnit, Image img) {
         super(xUnit, yUnit, img);
-        lives = 2;
         speed = 1;
+        score = 1000;
     }
 
     @Override
@@ -68,20 +63,13 @@ public class Kondoria extends Character{
             int objBottom = (int) (obj.getY() + 32);
             if(objLeft < enemyRight && objRight > enemyLeft && objTop < enemyBottom && objBottom > enemyTop) {
                 if(obj instanceof Explosion){
-                    lives--;
+                    isDead = true;
                     break;
                 }
             }
         }
     }
-    public boolean canBeRedirected(int x, int y) {
-        return x % 32 == 0 && y % 32 == 0;
-    }
-    public void animateDead() {
-        img = Sprite.movingSprite(Sprite.mob_dead1, Sprite.mob_dead2, Sprite.mob_dead3, BombermanGame.currentTime / 100, 60).getFxImage();
-    }
-    @Override
-    public void update() {
+    public void characterMove() {
         if (canBeRedirected(x, y)) {
             Random r = new Random();
             randomNumber = r.nextInt(4) + 1;
@@ -95,27 +83,10 @@ public class Kondoria extends Character{
                 direction = "DOWN";
             }
         }
-        if (lives > 0) {
-            if (timeMove > 0) {
-                timeMove--;
-            } else {
-                move(direction);
-                changeAnimation(direction);
-                timeMove = 5;
-            }
-        } else {
-            isDead = true;
-            if (timeDead > 0) {
-                if (timeDead >= 200) {
-                    changeAnimation("DEAD");
-                }
-                timeDead--;
-                animateDead();
-            } else {
-                setExist(false);
-            }
-        }
+    }
+
+    @Override
+    public void update() {
         super.update();
-        collisionHandling();
     }
 }

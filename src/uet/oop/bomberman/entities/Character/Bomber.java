@@ -11,18 +11,19 @@ import uet.oop.bomberman.entities.Block.Bomb;
 import uet.oop.bomberman.entities.Block.Portal;
 import uet.oop.bomberman.entities.Entity;
 import uet.oop.bomberman.entities.Explosion.Explosion;
-import uet.oop.bomberman.entities.Item.BombItem;
-import uet.oop.bomberman.entities.Item.FlameItem;
-import uet.oop.bomberman.entities.Item.SpeedItem;
+import uet.oop.bomberman.entities.Item.*;
 import uet.oop.bomberman.graphics.Sprite;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class Bomber extends Character {
+public class Bomber extends Player {
     private int bombLimit;
     private int bombRange;
+    private boolean FlamePassed = false;
+    private boolean WallPassed = false;
+    private boolean BombPassed = false;
     private int timeImmortal = 0;
     private boolean isDead = false;
     private int score = 0;
@@ -33,6 +34,7 @@ public class Bomber extends Character {
     private final BooleanProperty sPressed = new SimpleBooleanProperty();
     private final BooleanProperty dPressed = new SimpleBooleanProperty();
     private final BooleanProperty spacePressed = new SimpleBooleanProperty();
+    private final BooleanProperty bPressed = new SimpleBooleanProperty();
     private final Scene scene;
 
     public Bomber(int x, int y, Image img) {
@@ -63,7 +65,23 @@ public class Bomber extends Character {
         int yTop = (tileY + diff) / Sprite.SCALED_SIZE;
         int yBottom = (tileY + Sprite.SCALED_SIZE - diff) / Sprite.SCALED_SIZE;
         //check move
-        isMoving = map[yTop][xLeft] == ' ' && map[yTop][xRight] == ' ' && map[yBottom][xLeft] == ' ' && map[yBottom][xRight] == ' ';
+        if(WallPassed && !BombPassed){
+            isMoving = (map[yTop][xLeft] == ' ' || map[yTop][xLeft] == '*') && (map[yTop][xRight] == ' ' || map[yTop][xRight] == '*')
+                    && (map[yBottom][xLeft] == ' ' || map[yBottom][xLeft] == '*') && (map[yBottom][xRight] == ' ' || map[yBottom][xRight] == '*');
+        }
+        if(BombPassed && !WallPassed){
+            isMoving = (map[yTop][xLeft] == ' ' || map[yTop][xLeft] == '%') && (map[yTop][xRight] == ' ' || map[yTop][xRight] == '%')
+                    && (map[yBottom][xLeft] == ' ' || map[yBottom][xLeft] == '%') && (map[yBottom][xRight] == ' ' || map[yBottom][xRight] == '%');
+        }
+        if(BombPassed && WallPassed){
+            isMoving = (map[yTop][xLeft] == ' ' || map[yTop][xLeft] == '%' || map[yTop][xLeft] == '*')
+                    && (map[yTop][xRight] == ' ' || map[yTop][xRight] == '%' || map[yTop][xRight] == '*')
+                    && (map[yBottom][xLeft] == ' ' || map[yBottom][xLeft] == '%' || map[yBottom][xLeft] == '*')
+                    && (map[yBottom][xRight] == ' ' || map[yBottom][xRight] == '%' || map[yBottom][xRight] == '*');
+        }
+        if(!WallPassed && !BombPassed){
+            isMoving = map[yTop][xLeft] == ' ' && map[yTop][xRight] == ' ' && map[yBottom][xLeft] == ' ' && map[yBottom][xRight] == ' ';
+        }
     }
 
     public void animateDead() {
@@ -99,9 +117,9 @@ public class Bomber extends Character {
         int bomberTop = this.y + 5;
         int bomberBottom = this.y + 25;
         //check collision
-        for (Character enemy : BombermanGame.getEntities()) {
-            if (enemy instanceof Ballom || enemy instanceof Oneal) {
-                if (enemy.isDead()) {
+        for (Entity enemy : BombermanGame.getEntities()) {
+            if (enemy instanceof Enemy) {
+                if (((Enemy) enemy).isDead()) {
                     continue;
                 }
                 int enemyLeft = (int) enemy.getX();
@@ -128,7 +146,7 @@ public class Bomber extends Character {
                     isNextLevel = true;
                     break;
                 }
-                if (obj instanceof Explosion && timeImmortal == 0) {
+                if (obj instanceof Explosion && timeImmortal == 0 && !FlamePassed) {
                     lives--;
                     isDead = true;
                     break;
@@ -151,13 +169,31 @@ public class Bomber extends Character {
                     bombRange++;
                     break;
                 }
+                if(obj instanceof WallPassItem){
+                    obj.setExist(false);
+                    Sound.playSfx(Sound.takePower);
+                    WallPassed = true;
+                    break;
+                }
+                if(obj instanceof BombPassItem){
+                    obj.setExist(false);
+                    Sound.playSfx(Sound.takePower);
+                    BombPassed = true;
+                    break;
+                }
+                if(obj instanceof FlamePassItem){
+                    obj.setExist(false);
+                    Sound.playSfx(Sound.takePower);
+                    FlamePassed = true;
+                    break;
+                }
             }
 
 
         }
         // check if bomber is dead
         if (isDead) {
-            timeImmortal = 200;
+            timeImmortal = 500;
         }
     }
 
@@ -251,6 +287,7 @@ public class Bomber extends Character {
     public void setNextLevel(boolean nextLevel) {
         isNextLevel = nextLevel;
     }
+
     public void reset() {
         wPressed.set(false);
         aPressed.set(false);
@@ -262,20 +299,26 @@ public class Bomber extends Character {
 
     @Override
     public void update() {
-        if(lives == 0){
-            isDead = true;
-        }
+        // control bomber
         if (lives > 0 && !isDead) {
             control();
             super.update();
             collisionHandling();
         }
+        // sound die
+        if (timeImmortal == 500) {
+            Sound.playSfx(Sound.die);
+        }
+        // die
         if (timeImmortal > 0) {
             timeImmortal--;
-            animateDead();
-            Sound.playSfx(Sound.die);
-            if (timeImmortal < 10) {
-                changeAnimation("RIGHT");
+            if (timeImmortal > 300) {
+                animateDead();
+            } else if (timeImmortal > 200) {
+                img = Sprite.player_right.getFxImage();
+            } else {
+                control();
+                super.update();
             }
         } else {
             isDead = false;

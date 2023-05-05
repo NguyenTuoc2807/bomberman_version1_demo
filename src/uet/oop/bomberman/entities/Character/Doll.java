@@ -2,21 +2,18 @@ package uet.oop.bomberman.entities.Character;
 
 import javafx.scene.image.Image;
 import uet.oop.bomberman.BombermanGame;
-import uet.oop.bomberman.entities.Block.Bomb;
 import uet.oop.bomberman.entities.Entity;
 import uet.oop.bomberman.entities.Explosion.Explosion;
 import uet.oop.bomberman.graphics.Sprite;
 
-public class Doll extends Character{
-    public long timeMove = 5;
-    public long timeDead = 300;
-    public String direction = "RIGHT";
+import java.util.Random;
 
+public class Doll extends Enemy{
     // Nhân vật biết né bom
     public Doll(int xUnit, int yUnit, Image img) {
         super(xUnit, yUnit, img);
         speed = 3;
-        lives = 4;
+        score = 400;
     }
 
     @Override
@@ -57,22 +54,38 @@ public class Doll extends Character{
         int enemyTop = this.y;
         int enemyBottom = this.y + 32;
         // check collision
-        for(Entity obj : BombermanGame.getStillObjects()) {
+        for (Entity obj : BombermanGame.getStillObjects()) {
             int objLeft = (int) obj.getX();
             int objRight = (int) (obj.getX() + 32);
             int objTop = (int) obj.getY();
             int objBottom = (int) (obj.getY() + 32);
-            if(objLeft < enemyRight && objRight > enemyLeft && objTop < enemyBottom && objBottom > enemyTop) {
-                if(obj instanceof Explosion){
-                    lives--;
+            if (objLeft < enemyRight && objRight > enemyLeft && objTop < enemyBottom && objBottom > enemyTop) {
+                if (obj instanceof Explosion) {
+                    isDead = true;
                     break;
                 }
             }
         }
     }
 
+    public void characterMove() {
+        if (canBeRedirected(x, y)) {
+            Random r = new Random();
+            randomNumber = r.nextInt(4) + 1;
+            if (randomNumber == 1) {
+                direction = "LEFT";
+            } else if (randomNumber == 2) {
+                direction = "RIGHT";
+            } else if (randomNumber == 3) {
+                direction = "UP";
+            } else {
+                direction = "DOWN";
+            }
+        }
+    }
+
     @Override
     public void update() {
-
+        super.update();
     }
 }
