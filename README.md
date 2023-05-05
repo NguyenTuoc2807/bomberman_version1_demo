@@ -65,3 +65,45 @@ Xem comment ở starter project
 3. Xử lý hiệu ứng âm thanh (thêm music & sound effects) +1đ
 4. Phát triển hệ thống server-client để nhiều người có thể cùng chơi qua mạng LAN hoặc Internet +1đ
 5. Những ý tưởng khác sẽ được đánh giá và cộng điểm theo mức tương ứng
+## Cấu trúc file 
+```
+src
+├── ControlGame
+│   ├── ConllisionManager.java
+│   └──  LevelManager.java
+├── entities
+│   ├── Ai
+│   │   ├── Astar 
+│   │   └── Node.java
+│   ├──Block
+│   │   ├── Bomb.java  
+│   │   ├── Brick.java  
+│   │   ├── Grass.java  
+│   │   ├── Portal.java  
+│   │   └── Wall.java  
+│   ├── Character
+│   │   ├── Ballom.java  
+│   │   ├── Bomber.java  
+│   │   ├── Doll.java  
+│   │   ├── Kondoria.java
+│   │   ├── Oneal.java  
+│   │   └── Minvo.java  
+│   ├── Explosion
+│   │   ├── Explosion.java
+│   │   ├── ExplosionDown.java
+│   │   ├── ExplosionHorizontal.java
+│   │   ├── ExplosionLeft.java
+│   │   ├── ExplosionRight.java
+│   │   ├── ExplosionUp.java
+│   │   └──ExplosionVertical.java
+│   ├── item
+│   │   ├── BombItem.java  
+│   │   ├── FlameItems.java  
+│   │   └── SpeedItem.java  
+│   └── Entity.java  
+├── graphics
+│   ├── Sprite.java  
+│   └── SpriteSheet.java  
+├── Sound  
+│   └── Sound.java 
+└── BombermanGame.java
