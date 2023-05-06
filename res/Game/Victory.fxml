@@ -6,11 +6,11 @@
 <?import javafx.scene.layout.AnchorPane?>
 
 
-<AnchorPane prefHeight="416.0" prefWidth="922.0" styleClass="body" stylesheets="@Image/Victory.css" xmlns="http://javafx.com/javafx/8.0.361" xmlns:fx="http://javafx.com/fxml/1" fx:controller="uet.oop.bomberman.BombermanGame">
+<AnchorPane prefHeight="416.0" prefWidth="922.0" styleClass="body" stylesheets="@Victory.css" xmlns="http://javafx.com/javafx/8.0.361" xmlns:fx="http://javafx.com/fxml/1" fx:controller="uet.oop.bomberman.BombermanGame">
    <children>
       <ImageView fitHeight="282.0" fitWidth="486.0" layoutX="218.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@Image/victory.jpg" />
+            <Image url="@../Data/victory.jpg" />
          </image>
       </ImageView>
       <Button id="backtomenu" layoutX="172.0" layoutY="327.0" mnemonicParsing="false" text="Back To Menu" />

@@ -77,7 +77,7 @@ public class Oneal extends Enemy {
     public void characterMove() {
         if (canBeRedirected(this.x, this.y)) {
             Node start = new Node(this.y / 32, this.x / 32);
-            Node end = new Node((int) bomber.getY() / 32, (int) bomber.getX() / 32);
+            Node end = new Node((int) Math.round(bomber.getY() / 32) , (int) Math.round(bomber.getX() / 32) );
             Astar astar = new Astar(height, width, start, end);
             int[][] blocksArray = new int[width * height][2];
             int countBlock = 0;

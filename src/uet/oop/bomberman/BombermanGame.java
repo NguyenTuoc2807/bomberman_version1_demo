@@ -137,7 +137,7 @@ public class BombermanGame extends Application {
             @Override
             public void handle(long l) {
                 // next level
-                if (bomber.isNextLevel()) {
+                if (bomber.isNextLevel() && !levelManager.victory()) {
                     bomber.setNextLevel(false);
                     levelManager.nextLevel();
                     try {
@@ -150,6 +150,14 @@ public class BombermanGame extends Application {
                 if (bomber.getLives() == 0 || time == 0) {
                     try {
                         GameOver();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                // victory
+                if (levelManager.victory()) {
+                    try {
+                        Victory();
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
@@ -182,6 +190,7 @@ public class BombermanGame extends Application {
         nextButton.setOnAction(event -> {
             createMap(levelManager.getLevel());
             bomber.resetNextLevel();
+            Sound.playInGame();
             stage.setScene(gameScene);
             timer.start();
             timeline.play();
@@ -220,6 +229,29 @@ public class BombermanGame extends Application {
         scoreLabel.setText(String.format("Score: %d", bomber.getScore()));
 
         menuScene = new Scene(gameOverBox);
+        stage.setScene(menuScene);
+    }
+
+    private void Victory() throws IOException {
+        // stop game
+        Sound.stopInGame();
+        timeline.stop();
+        timer.stop();
+        // victory
+        FXMLLoader fxmlLoader = new FXMLLoader(new File("res/Game/Victory.fxml").toURI().toURL());
+        AnchorPane victoryBox = fxmlLoader.load();
+        Button menu = (Button) victoryBox.lookup("#backtomenu");
+        menu.setOnAction(event -> {
+            try {
+                createMenu();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        Button quit = (Button) victoryBox.lookup("#quitgame");
+        quit.setOnAction(event -> stage.close());
+
+        menuScene = new Scene(victoryBox);
         stage.setScene(menuScene);
     }
 

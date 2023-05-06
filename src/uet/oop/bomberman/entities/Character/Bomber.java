@@ -25,7 +25,8 @@ public class Bomber extends Player {
     private boolean WallPassed = false;
     private boolean BombPassed = false;
     private boolean Detonator = false;
-    private int timeImmortal = 0;
+    private final int timeImmortal = 500;
+    private int time = 0;
     private boolean isDead = false;
     private int score = 0;
     private boolean isNextLevel = false;
@@ -156,7 +157,7 @@ public class Bomber extends Player {
                     isNextLevel = true;
                     break;
                 }
-                if (obj instanceof Explosion && timeImmortal == 0 && !FlamePassed) {
+                if (obj instanceof Explosion && time == 0 && !FlamePassed) {
                     lives--;
                     isDead = true;
                     break;
@@ -209,7 +210,7 @@ public class Bomber extends Player {
         }
         // check if bomber is dead
         if (isDead) {
-            timeImmortal = 500;
+            time = timeImmortal;
         }
     }
 
@@ -321,6 +322,7 @@ public class Bomber extends Player {
     public void resetDead() {
         bombLimit = 1;
         bombRange = 1;
+        speed = 1;
         WallPassed = false;
         BombPassed = false;
         FlamePassed = false;
@@ -336,15 +338,15 @@ public class Bomber extends Player {
             collisionHandling();
         }
         // sound die
-        if (timeImmortal == 500) {
+        if (time == timeImmortal) {
             Sound.playSfx(Sound.die);
         }
         // die
-        if (timeImmortal > 0) {
-            timeImmortal--;
-            if (timeImmortal > 300) {
+        if (time > 0) {
+            time--;
+            if (time > 300) {
                 animateDead();
-            } else if (timeImmortal > 200) {
+            } else if (time > 200) {
                 img = Sprite.player_right.getFxImage();
             } else {
                 control();
