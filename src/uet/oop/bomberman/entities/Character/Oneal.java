@@ -17,7 +17,7 @@ import static uet.oop.bomberman.BombermanGame.*;
 public class Oneal extends Enemy {
     public Oneal(int x, int y, Image img) {
         super(x, y, img);
-        speed = 2;
+        speed = 1;
         score = 200;
     }
 
@@ -95,7 +95,6 @@ public class Oneal extends Enemy {
             if (path.size() > 1) {
                 int nxtX = path.get(1).getCol();
                 int nxtY = path.get(1).getRow();
-                ;
                 if (this.y / 32 > nxtY) {
                     direction = "UP";
                 }

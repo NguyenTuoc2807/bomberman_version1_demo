@@ -14,6 +14,7 @@ public abstract class Enemy extends Entity {
     public int score;
     public boolean isDead = false;
     public long timeMove = 5;
+    public long time =timeMove;
     public long timeDead = 500;
     public int randomNumber = 1;
     public String direction = "RIGHT";
@@ -80,12 +81,12 @@ public abstract class Enemy extends Entity {
     public void update() {
         characterMove();
         if (!isDead) {
-            if (timeMove > 0) {
-                timeMove--;
+            if (time > 0) {
+                time--;
             } else {
                 move(direction);
                 changeAnimation(direction);
-                timeMove = 4;
+                time = timeMove;
             }
         } else {
             if (timeDead > 0) {

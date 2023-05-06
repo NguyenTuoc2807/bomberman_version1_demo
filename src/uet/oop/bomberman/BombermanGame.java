@@ -20,7 +20,6 @@ import uet.oop.bomberman.entities.Block.Grass;
 import uet.oop.bomberman.entities.Block.Portal;
 import uet.oop.bomberman.entities.Block.Wall;
 import uet.oop.bomberman.entities.Character.*;
-import uet.oop.bomberman.entities.Character.Oneal;
 import uet.oop.bomberman.entities.Entity;
 import uet.oop.bomberman.entities.Item.*;
 import uet.oop.bomberman.graphics.Sprite;
@@ -52,7 +51,8 @@ public class BombermanGame extends Application {
     private long startTime;
 
     public static long currentTime;
-    private int time;
+    private final int timeGame = 120;
+    private int time = timeGame;
     public static Bomber bomber;
     private int level;
     public static int height;
@@ -107,12 +107,12 @@ public class BombermanGame extends Application {
         gameScene = new Scene(gameBox);
         Sound.playInGame();
         // game initialization
-        bomber = new Bomber(1,1,Sprite.player_right.getFxImage());
+        bomber = new Bomber(1, 1, Sprite.player_right.getFxImage());
         levelManager = new LevelManager();
         createMap(levelManager.getLevel());
         // timer
         timeline = new Timeline();
-        time = 60;
+        time = timeGame;
         timeline.setCycleCount(Timeline.INDEFINITE);
         Label timerLabel = (Label) gameBox.lookup("#timer");
         Label livesLabel = (Label) gameBox.lookup("#lives");
@@ -165,13 +165,14 @@ public class BombermanGame extends Application {
         timer.start();
         stage.setScene(gameScene);
     }
+
     private void nextLevel() throws IOException {
         // stop game
         timeline.stop();
         timer.stop();
         Sound.stopInGame();
         // next level
-        time = 60;
+        time = timeGame;
         FXMLLoader fxmlLoader = new FXMLLoader(new File("res/Game/NextLevel.fxml").toURI().toURL());
         AnchorPane nextLevelBox = fxmlLoader.load();
 
@@ -180,6 +181,7 @@ public class BombermanGame extends Application {
         Button nextButton = (Button) nextLevelBox.lookup("#nextLevel");
         nextButton.setOnAction(event -> {
             createMap(levelManager.getLevel());
+            bomber.resetNextLevel();
             stage.setScene(gameScene);
             timer.start();
             timeline.play();
@@ -188,6 +190,7 @@ public class BombermanGame extends Application {
         menuScene = new Scene(nextLevelBox);
         stage.setScene(menuScene);
     }
+
     private void GameOver() throws IOException {
         // stop game
         Sound.stopInGame();
@@ -213,6 +216,8 @@ public class BombermanGame extends Application {
                 throw new RuntimeException(e);
             }
         });
+        Label scoreLabel = (Label) gameOverBox.lookup("#scoreGame");
+        scoreLabel.setText(String.format("Score: %d", bomber.getScore()));
 
         menuScene = new Scene(gameOverBox);
         stage.setScene(menuScene);
@@ -233,7 +238,7 @@ public class BombermanGame extends Application {
                 obj.update();
             } else {
                 entities.remove(obj);
-                if(obj instanceof Enemy){
+                if (obj instanceof Enemy) {
                     bomber.setScore(bomber.getScore() + ((Enemy) obj).getScore());
                 }
             }
@@ -274,7 +279,6 @@ public class BombermanGame extends Application {
                             case 'p': {
                                 bomber.setX(j);
                                 bomber.setY(i);
-                                bomber.reset();
                                 entities.add(bomber);
                                 stillObjects.add(new Grass(j, i, Sprite.grass.getFxImage()));
                                 break;
@@ -345,6 +349,14 @@ public class BombermanGame extends Application {
                                 mapData[i][j] = '*';
                                 break;
                             }
+                            case 'D': {
+                                Entity obj = new DetonatorItem(j, i, Sprite.powerup_detonator.getFxImage());
+                                stillObjects.add(new Grass(j, i, Sprite.grass.getFxImage()));
+                                stillObjects.add(obj);
+                                stillObjects.add(new Brick(j, i, Sprite.brick.getFxImage()));
+                                mapData[i][j] = '*';
+                                break;
+                            }
 
                             case '1': {
                                 Ballom obj = new Ballom(j, i, Sprite.balloom_right1.getFxImage());
@@ -354,29 +366,29 @@ public class BombermanGame extends Application {
                             }
 
                             case '2': {
-                                Oneal oneal = new Oneal(j,i,Sprite.oneal_right1.getFxImage());
-                                stillObjects.add(new Grass(j,i,Sprite.grass.getFxImage()));
+                                Oneal oneal = new Oneal(j, i, Sprite.oneal_right1.getFxImage());
+                                stillObjects.add(new Grass(j, i, Sprite.grass.getFxImage()));
                                 entities.add((oneal));
                                 break;
                             }
 
                             case '3': {
                                 Kondoria obj = new Kondoria(j, i, Sprite.kondoria_right1.getFxImage());
-                                stillObjects.add(new Grass(j,i,Sprite.grass.getFxImage()));
+                                stillObjects.add(new Grass(j, i, Sprite.grass.getFxImage()));
                                 entities.add((obj));
                                 break;
                             }
 
                             case '4': {
                                 Doll obj = new Doll(j, i, Sprite.kondoria_right2.getFxImage());
-                                stillObjects.add(new Grass(j,i,Sprite.grass.getFxImage()));
+                                stillObjects.add(new Grass(j, i, Sprite.grass.getFxImage()));
                                 entities.add((obj));
                                 break;
                             }
 
                             case '5': {
                                 Minvo obj = new Minvo(j, i, Sprite.kondoria_right3.getFxImage());
-                                stillObjects.add(new Grass(j,i,Sprite.grass.getFxImage()));
+                                stillObjects.add(new Grass(j, i, Sprite.grass.getFxImage()));
                                 entities.add((obj));
                                 break;
                             }

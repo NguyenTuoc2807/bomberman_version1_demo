@@ -24,6 +24,7 @@ public class Bomber extends Player {
     private boolean FlamePassed = false;
     private boolean WallPassed = false;
     private boolean BombPassed = false;
+    private boolean Detonator = false;
     private int timeImmortal = 0;
     private boolean isDead = false;
     private int score = 0;
@@ -41,7 +42,7 @@ public class Bomber extends Player {
         super(x, y, img);
         this.scene = BombermanGame.getGameScene();
         this.speed = 1;
-        this.bombLimit = 1;
+        this.bombLimit = 3;
         this.bombRange = 1;
         this.lives = 3;
     }
@@ -51,10 +52,19 @@ public class Bomber extends Player {
             int x = (int) Math.round((double) this.x / 32);
             int y = (int) Math.round((double) this.y / 32);
             Bomb bomb = new Bomb(x, y, Sprite.bomb.getFxImage(), bombRange);
+            if(Detonator) {
+                bomb.setDetonatorPassed(true);
+            }
             bombs.add(bomb);
             BombermanGame.getStillObjects().add(bomb);
             bombLimit--;
             Sound.playSfx(Sound.placeBomb);
+        }
+    }
+
+    public void detonateBomb() {
+        if(bombs.size() > 0){
+            bombs.get(0).setDetonator(true);
         }
     }
 
@@ -187,6 +197,12 @@ public class Bomber extends Player {
                     FlamePassed = true;
                     break;
                 }
+                if(obj instanceof DetonatorItem){
+                    obj.setExist(false);
+                    Sound.playSfx(Sound.takePower);
+                    Detonator = true;
+                    break;
+                }
             }
 
 
@@ -198,27 +214,32 @@ public class Bomber extends Player {
     }
 
     public void control() {
-        if (lives > 0) {
-            setControl();
-            if (wPressed.get()) {
-                move("UP");
-            }
+        setControl();
+        if (wPressed.get()) {
+            move("UP");
+        }
 
-            if (sPressed.get()) {
-                move("DOWN");
-            }
+        if (sPressed.get()) {
+            move("DOWN");
+        }
 
-            if (aPressed.get()) {
-                move("LEFT");
-            }
+        if (aPressed.get()) {
+            move("LEFT");
+        }
 
-            if (dPressed.get()) {
-                move("RIGHT");
-            }
+        if (dPressed.get()) {
+            move("RIGHT");
+        }
 
-            if (spacePressed.get()) {
-                placeBomb();
-                spacePressed.set(false);
+        if (spacePressed.get()) {
+            placeBomb();
+            spacePressed.set(false);
+        }
+
+        if(Detonator){
+            if(bPressed.get()){
+                detonateBomb();
+                bPressed.set(false);
             }
         }
     }
@@ -244,6 +265,10 @@ public class Bomber extends Player {
             if (e.getCode() == KeyCode.SPACE) {
                 spacePressed.set(true);
             }
+
+            if(e.getCode() == KeyCode.B){
+                bPressed.set(true);
+            }
         });
         scene.setOnKeyReleased(e -> {
             if (e.getCode() == KeyCode.W) {
@@ -262,9 +287,6 @@ public class Bomber extends Player {
                 dPressed.set(false);
             }
 
-            if (e.getCode() == KeyCode.SPACE) {
-                spacePressed.set(false);
-            }
         });
     }
 
@@ -288,13 +310,21 @@ public class Bomber extends Player {
         isNextLevel = nextLevel;
     }
 
-    public void reset() {
+    public void resetNextLevel() {
         wPressed.set(false);
         aPressed.set(false);
         sPressed.set(false);
         dPressed.set(false);
         moveX = x;
         moveY = y;
+    }
+    public void resetDead() {
+        bombLimit = 1;
+        bombRange = 1;
+        WallPassed = false;
+        BombPassed = false;
+        FlamePassed = false;
+        Detonator = false;
     }
 
     @Override
@@ -330,6 +360,9 @@ public class Bomber extends Player {
                 bombs.remove(bomb);
                 bombLimit++;
             }
+        }
+        if(isDead){
+            resetDead();
         }
     }
 }

@@ -12,7 +12,7 @@ public class Doll extends Enemy{
     // Nhân vật biết né bom
     public Doll(int xUnit, int yUnit, Image img) {
         super(xUnit, yUnit, img);
-        speed = 3;
+        speed = 2;
         score = 400;
     }
 

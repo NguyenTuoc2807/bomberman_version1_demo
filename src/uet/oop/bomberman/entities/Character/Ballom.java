@@ -14,6 +14,7 @@ public class Ballom extends Enemy {
         super(x, y, img);
         speed = 1;
         score = 100;
+        timeMove = 10;
     }
 
     @Override

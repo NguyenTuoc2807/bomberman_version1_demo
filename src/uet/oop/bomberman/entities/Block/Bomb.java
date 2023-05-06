@@ -13,7 +13,9 @@ public class Bomb extends Entity {
     private final int timeToExplode = 300;
     private int timeLeft = timeToExplode;
     private boolean explore = false;
-    private int flameRange;
+    private final int flameRange;
+    private boolean detonator = false;
+    private boolean detonatorPassed = false;
     public boolean explosionUp = true, explosionDown = true, explosionRight = true, explosionLeft = true;
     CollisionManager collisionManager = new CollisionManager();
 
@@ -127,20 +129,20 @@ public class Bomb extends Entity {
     }
 
     public void animate() {
-        img = Sprite.movingSprite(Sprite.bomb, Sprite.bomb_1, Sprite.bomb_2, BombermanGame.currentTime, 120).getFxImage();
+        img = Sprite.movingSprite(Sprite.bomb, Sprite.bomb_1, Sprite.bomb_2, BombermanGame.currentTime/10, 60).getFxImage();
     }
 
     public void collisionHandling() {
         int bombLeft = this.x;
-        int bombRight = this.x + 32;
+        int bombRight = this.x + 30;
         int bombTop = this.y;
-        int bombBottom = this.y + 32;
+        int bombBottom = this.y + 30;
         for (Entity obj : BombermanGame.getEntities()) {
-            int objLeft = (int) obj.getX();
-            int objRight = (int) (obj.getX() + 32);
-            int objTop = (int) obj.getY();
-            int objBottom = (int) (obj.getY() + 32);
             if (obj instanceof Bomber) {
+                int objLeft = (int) obj.getX();
+                int objRight = (int) (obj.getX() + 32);
+                int objTop = (int) obj.getY();
+                int objBottom = (int) (obj.getY() + 32);
                 if (bombRight > objLeft && bombLeft < objRight && bombBottom > objTop && bombTop < objBottom) {
                     break;
                 } else {
@@ -149,13 +151,39 @@ public class Bomb extends Entity {
             }
 
         }
+        for (Entity obj : BombermanGame.getStillObjects()) {
+            if (obj instanceof Explosion) {
+                int objLeft = (int) obj.getX();
+                int objRight = (int) (obj.getX() + 32);
+                int objTop = (int) obj.getY();
+                int objBottom = (int) (obj.getY() + 32);
+                if (bombRight > objLeft && bombLeft < objRight && bombBottom > objTop && bombTop < objBottom) {
+                    explore = true;
+                }
+            }
+        }
+    }
+
+    public void setDetonatorPassed(boolean detonatorPassed) {
+        this.detonatorPassed = detonatorPassed;
+    }
+
+    public void setDetonator(boolean detonator) {
+        this.detonator = detonator;
     }
 
     @Override
     public void update() {
-        collisionHandling();
         animate();
-        if (timeLeft > 0) {
+        collisionHandling();
+        if (detonatorPassed){
+            if(detonator || explore){
+                this.setExist(false);
+                collisionManager.setMap(x / 32, y / 32, ' ');
+                setExplore(true);
+                explode();
+            }
+        } else if (timeLeft > 0 && !explore) {
             timeLeft--;
         } else {
             this.setExist(false);
