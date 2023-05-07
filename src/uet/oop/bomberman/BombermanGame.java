@@ -10,6 +10,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -53,6 +54,7 @@ public class BombermanGame extends Application {
     public static long currentTime;
     private final int timeGame = 120;
     private int time = timeGame;
+    private boolean pause = false;
     public static Bomber bomber;
     private int level;
     public static int height;
@@ -106,6 +108,20 @@ public class BombermanGame extends Application {
         gc = canvas.getGraphicsContext2D();
         gameScene = new Scene(gameBox);
         Sound.playInGame();
+        Label pauseButton = (Label) gameBox.lookup("#pause");
+        pauseButton.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+            if(!pause) {
+                timer.stop();
+                timeline.pause();
+                pauseButton.setText("Continue");
+                pause = true;
+            } else {
+                timer.start();
+                timeline.play();
+                pauseButton.setText("Pause");
+                pause = false;
+            }
+        });
         // game initialization
         bomber = new Bomber(1, 1, Sprite.player_right.getFxImage());
         levelManager = new LevelManager();
@@ -189,7 +205,6 @@ public class BombermanGame extends Application {
         Button nextButton = (Button) nextLevelBox.lookup("#nextLevel");
         nextButton.setOnAction(event -> {
             createMap(levelManager.getLevel());
-            bomber.resetNextLevel();
             Sound.playInGame();
             stage.setScene(gameScene);
             timer.start();
@@ -311,6 +326,7 @@ public class BombermanGame extends Application {
                             case 'p': {
                                 bomber.setX(j);
                                 bomber.setY(i);
+                                bomber.resetLevel();
                                 entities.add(bomber);
                                 stillObjects.add(new Grass(j, i, Sprite.grass.getFxImage()));
                                 break;

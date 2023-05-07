@@ -7,7 +7,7 @@ import java.util.List;
 
 public class LevelManager {
     private static List<String> level = new ArrayList<>();
-    private int currentLevel = 1;
+    private int currentLevel = 0;
 
     public LevelManager() {
         level.add("res/levels/level1.txt");
@@ -28,7 +28,7 @@ public class LevelManager {
     }
 
     public boolean victory() {
-        return currentLevel == level.size();
+        return currentLevel == level.size() ;
     }
 
 }

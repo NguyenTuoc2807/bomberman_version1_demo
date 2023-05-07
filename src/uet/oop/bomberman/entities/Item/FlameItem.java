@@ -8,6 +8,11 @@ public class FlameItem extends Item {
     }
 
     @Override
+    public String getName() {
+        return "bombRange";
+    }
+
+    @Override
     public void update() {
         super.update();
     }

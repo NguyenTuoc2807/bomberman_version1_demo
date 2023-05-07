@@ -8,6 +8,11 @@ public class BombPassItem extends Item {
     }
 
     @Override
+    public String getName() {
+        return "bombPass";
+    }
+
+    @Override
     public void update() {
         super.update();
     }

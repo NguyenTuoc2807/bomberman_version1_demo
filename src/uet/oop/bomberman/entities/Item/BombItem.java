@@ -8,6 +8,11 @@ public class BombItem extends Item {
     }
 
     @Override
+    public String getName() {
+        return "bomb";
+    }
+
+    @Override
     public void update() {
         super.update();
     }

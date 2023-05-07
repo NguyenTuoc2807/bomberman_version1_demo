@@ -8,6 +8,11 @@ public class FlamePassItem extends Item {
     }
 
     @Override
+    public String getName() {
+        return "flamePass";
+    }
+
+    @Override
     public void update() {
         super.update();
     }

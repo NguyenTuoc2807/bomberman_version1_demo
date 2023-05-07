@@ -4,17 +4,35 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.effect.Glow?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="461.0" prefWidth="986.0" stylesheets="@GamePlay.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="461.0" prefWidth="986.0" styleClass="body" stylesheets="@GamePlay.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <Canvas fx:id="gameplay" layoutY="45.0" width="1000.0" />
-      <Label fx:id="timer" alignment="CENTER" prefHeight="45.0" prefWidth="140.0" text="Start" textAlignment="CENTER" textOverrun="CLIP">
+      <Label fx:id="timer" alignment="CENTER" prefHeight="45.0" prefWidth="140.0" text="Start" textAlignment="CENTER" textFill="WHITE" textOverrun="CLIP">
          <effect>
             <Glow />
          </effect>
+         <font>
+            <Font name="System Italic" size="15.0" />
+         </font>
       </Label>
-      <Label fx:id="lives" alignment="CENTER" layoutX="140.0" prefHeight="45.0" prefWidth="140.0" text="Live" />
-      <Label fx:id="score" alignment="CENTER" layoutX="280.0" prefHeight="45.0" prefWidth="140.0" text="Score" />
-      <Label fx:id="level" alignment="CENTER" layoutX="420.0" prefHeight="45.0" prefWidth="140.0" text="Level" />
+      <Label fx:id="lives" alignment="CENTER" layoutX="140.0" prefHeight="45.0" prefWidth="140.0" text="Live" textFill="WHITE">
+         <font>
+            <Font name="System Italic" size="15.0" />
+         </font></Label>
+      <Label fx:id="score" alignment="CENTER" layoutX="280.0" prefHeight="45.0" prefWidth="140.0" text="Score" textFill="WHITE">
+         <font>
+            <Font name="System Italic" size="15.0" />
+         </font></Label>
+      <Label fx:id="level" alignment="CENTER" layoutX="420.0" prefHeight="45.0" prefWidth="140.0" text="Level" textFill="WHITE">
+         <font>
+            <Font name="System Italic" size="15.0" />
+         </font></Label>
+      <Label id="pause" alignment="CENTER" layoutX="846.0" prefHeight="45.0" prefWidth="140.0" text="Pause" textFill="WHITE">
+         <font>
+            <Font name="System Italic" size="15.0" />
+         </font>
+      </Label>
    </children>
 </AnchorPane>

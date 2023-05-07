@@ -8,6 +8,11 @@ public class DetonatorItem extends Item {
     }
 
     @Override
+    public String getName() {
+        return "detonator";
+    }
+
+    @Override
     public void update() {
         super.update();
     }

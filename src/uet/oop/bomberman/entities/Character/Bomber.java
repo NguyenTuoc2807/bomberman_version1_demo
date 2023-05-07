@@ -162,51 +162,13 @@ public class Bomber extends Player {
                     isDead = true;
                     break;
                 }
-                if (obj instanceof SpeedItem) {
+                if (obj instanceof Item) {
                     obj.setExist(false);
                     Sound.playSfx(Sound.takePower);
-                    speed++;
-                    break;
-                }
-                if (obj instanceof BombItem) {
-                    obj.setExist(false);
-                    Sound.playSfx(Sound.takePower);
-                    bombLimit++;
-                    break;
-                }
-                if (obj instanceof FlameItem) {
-                    obj.setExist(false);
-                    Sound.playSfx(Sound.takePower);
-                    bombRange++;
-                    break;
-                }
-                if(obj instanceof WallPassItem){
-                    obj.setExist(false);
-                    Sound.playSfx(Sound.takePower);
-                    WallPassed = true;
-                    break;
-                }
-                if(obj instanceof BombPassItem){
-                    obj.setExist(false);
-                    Sound.playSfx(Sound.takePower);
-                    BombPassed = true;
-                    break;
-                }
-                if(obj instanceof FlamePassItem){
-                    obj.setExist(false);
-                    Sound.playSfx(Sound.takePower);
-                    FlamePassed = true;
-                    break;
-                }
-                if(obj instanceof DetonatorItem){
-                    obj.setExist(false);
-                    Sound.playSfx(Sound.takePower);
-                    Detonator = true;
+                    updateSkill(((Item) obj).getName());
                     break;
                 }
             }
-
-
         }
         // check if bomber is dead
         if (isDead) {
@@ -311,7 +273,7 @@ public class Bomber extends Player {
         isNextLevel = nextLevel;
     }
 
-    public void resetNextLevel() {
+    public void resetLevel() {
         wPressed.set(false);
         aPressed.set(false);
         sPressed.set(false);
@@ -327,6 +289,32 @@ public class Bomber extends Player {
         BombPassed = false;
         FlamePassed = false;
         Detonator = false;
+    }
+
+    public void updateSkill(String skill) {
+        switch (skill) {
+            case "speed":
+                speed++;
+                break;
+            case "bomb":
+                bombLimit++;
+                break;
+            case "bombRange":
+                bombRange++;
+                break;
+            case "wallPass":
+                WallPassed = true;
+                break;
+            case "bombPass":
+                BombPassed = true;
+                break;
+            case "flamePass":
+                FlamePassed = true;
+                break;
+            case "detonator":
+                Detonator = true;
+                break;
+        }
     }
 
     @Override

@@ -8,6 +8,8 @@ public abstract class Item extends Entity {
         super(x, y, img);
     }
 
+    public abstract String getName();
+
     @Override
     public void update() {
 

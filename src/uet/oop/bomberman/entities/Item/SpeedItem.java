@@ -8,6 +8,11 @@ public class SpeedItem extends Item {
     }
 
     @Override
+    public String getName() {
+        return "speed";
+    }
+
+    @Override
     public void update() {
         super.update();
     }

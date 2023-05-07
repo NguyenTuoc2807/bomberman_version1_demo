@@ -92,9 +92,10 @@ public abstract class Enemy extends Entity {
             if (timeDead > 0) {
                 if (timeDead >= 200) {
                     changeAnimation("DEAD");
+                }else {
+                    animateDead();
                 }
                 timeDead--;
-                animateDead();
             } else {
                 setExist(false);
             }

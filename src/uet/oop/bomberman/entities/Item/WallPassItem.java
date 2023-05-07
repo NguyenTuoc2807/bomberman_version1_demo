@@ -8,6 +8,11 @@ public class WallPassItem extends Item {
     }
 
     @Override
+    public String getName() {
+        return "wallPass";
+    }
+
+    @Override
     public void update() {
         super.update();
     }
